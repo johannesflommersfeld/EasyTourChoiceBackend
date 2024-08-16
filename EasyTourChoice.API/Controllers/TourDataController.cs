@@ -7,7 +7,7 @@ namespace EasyTourChoice.API.Controllers;
 [ApiController]
 [Route("api/tourData")]
 public class TourDataController(
-    ITourDataRepository tourDataRepository, 
+    ITourDataRepository tourDataRepository,
     ILogger<TourDataController> logger
     ) : ControllerBase
 {

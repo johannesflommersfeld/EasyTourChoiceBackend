@@ -22,7 +22,7 @@ public class LocationTest
         if (altitude != null)
         {
             Assert.That(location.Altitude,
-                        Is.EqualTo(altitude).Within(Tolerances.DOUBLE_EPS * Math.Abs((double) altitude)));
+                        Is.EqualTo(altitude).Within(Tolerances.DOUBLE_EPS * Math.Abs((double)altitude)));
         }
     }
 
