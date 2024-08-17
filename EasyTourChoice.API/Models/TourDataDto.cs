@@ -7,15 +7,15 @@ public class TourDataDto
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "A tour needs to contain a name.")]
+    [Required]
     [MaxLength(50)]
     public required string Name { get; set; } = string.Empty;
 
     public Activity ActivityType { get; set; }
 
-    public Location? StartingLocation { get; set; }
+    public LocationDto? StartingLocation { get; set; }
 
-    public Location? ActivityLocation { get; set; }
+    public LocationDto? ActivityLocation { get; set; }
 
     public float? Duration { get; set; } // expected activity time in hours
 
@@ -23,11 +23,16 @@ public class TourDataDto
 
     public int? MetersOfElevation { get; set; }
 
+    public uint? Distance { get; set; } // total distance of the activity in km
+
+    [MaxLength(120)]
     public string? ShortDescription { get; set; }
 
     public GeneralDifficulty? Difficulty { get; set; } // unit depends on the type of activity
 
     public RiskLevel? Risk { get; set; } // categories depend on the type of activity
+
+    public byte? Aspect { get; set; } // encodes the encountered aspects (see definition in Types.cs)
 
     public AreaDto? Area { get; set; }
 

@@ -34,7 +34,7 @@ public class TourData
 
     public int? MetersOfElevation { get; set; }
 
-    public int? Distance { get; set; } // total distance of the activity in km
+    public uint? Distance { get; set; } // total distance of the activity in km
 
     [MaxLength(120)]
     public string? ShortDescription { get; set; }

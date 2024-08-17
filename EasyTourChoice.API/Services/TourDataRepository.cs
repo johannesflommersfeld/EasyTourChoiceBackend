@@ -1,23 +1,30 @@
+using Microsoft.EntityFrameworkCore;
+using EasyTourChoice.API.DbContexts;
 using EasyTourChoice.API.Entities;
 
 namespace EasyTourChoice.API.Services;
 
-public class TourDataRepository : ITourDataRepository
+public class TourDataRepository(TourDataContext context) : ITourDataRepository
 {
-    public IEnumerable<TourData> GetAll()
+    private readonly TourDataContext _context = context ?? throw new ArgumentNullException(nameof(context));
+
+    public async Task<IEnumerable<TourData>> GetAllToursAsync()
     {
-        return [];
+        return await _context.Tours.ToListAsync();
     }
 
-    public IEnumerable<TourData> GetAllByActivity(Activity activity)
+    public async Task<IEnumerable<TourData>> GetToursByActivityAsync(Activity activity)
     {
-        return [];
+        return await _context.Tours.Where(t => t.ActivityType == activity).ToListAsync();
     }
 
-    public TourData GetTourData(int id)
+    public async Task<IEnumerable<TourData>> GetToursByAreaAsync(int areaId)
     {
-        var tourData = new TourData() { Name = string.Empty};
-        return tourData;
+        return await _context.Tours.Where(t =>  t.AreaId == areaId).ToListAsync();
     }
 
+    public async Task<TourData?> GetTourByIdAsync(int id)
+    {
+        return await _context.Tours.Where(t => t.Id == id).FirstOrDefaultAsync();
+    }
 }

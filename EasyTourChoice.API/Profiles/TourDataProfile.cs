@@ -9,6 +9,5 @@ public class TourDataProfile : Profile
     {
         CreateMap<TourDataForCreationDto, TourData>();
         CreateMap<TourData, TourDataDto>();
-        CreateMap<IEnumerable<TourData>, IEnumerable<TourDataDto>>();
     }
 }

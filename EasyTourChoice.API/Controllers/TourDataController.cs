@@ -20,30 +20,44 @@ public class TourDataController(
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<IEnumerable<TourDataDto>> GetAllTourData()
+    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourData()
     {
         _logger.LogInformation("All tour data was requested");
-        var tourData = _tourDataRepository.GetAll();
+        var tourData = await _tourDataRepository.GetAllToursAsync();
 
         return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
     }
 
     [HttpGet("activities/{activity}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<IEnumerable<TourDataDto>> GetAllTourDataByActivity(Activity activity)
+    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourDataByActivity(Activity activity)
     {
-        _logger.LogInformation("Activity specific tour data was requested");
-        var tourData = _tourDataRepository.GetAllByActivity(activity);
+        _logger.LogInformation("Activity-specific tour data was requested");
+        var tourData = await _tourDataRepository.GetToursByActivityAsync(activity);
+
+        return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
+    }
+
+    [HttpGet("areas/{areaId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourDataByArea(int areaId)
+    {
+        _logger.LogInformation("Area-specific tour data was requested");
+        var tourData = await _tourDataRepository.GetToursByAreaAsync(areaId);
 
         return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
     }
 
     [HttpGet("tours/{tourId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<IEnumerable<TourDataDto>> GetTourData(int tourId)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetTourData(int tourId)
     {
-        _logger.LogInformation("Activity specific tour data was requested");
-        var tourData = _tourDataRepository.GetTourData(tourId);
+        _logger.LogInformation("Specific tour data was requested");
+        var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
+
+        if (tourData is null)
+            return NotFound();
 
         return Ok(_mapper.Map<TourDataDto>(tourData));
     }

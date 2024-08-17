@@ -4,8 +4,9 @@ namespace EasyTourChoice.API.Services;
 
 public interface ITourDataRepository
 {
-    IEnumerable<TourData> GetAll();
-    IEnumerable<TourData> GetAllByActivity(Activity activity);
-    TourData GetTourData(int id);
+    Task<IEnumerable<TourData>> GetAllToursAsync();
+    Task<IEnumerable<TourData>> GetToursByActivityAsync(Activity activity);
+    Task<IEnumerable<TourData>> GetToursByAreaAsync(int areaId);
+    Task<TourData?> GetTourByIdAsync(int id);
 }
 
