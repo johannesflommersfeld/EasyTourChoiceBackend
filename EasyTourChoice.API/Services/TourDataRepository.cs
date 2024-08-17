@@ -1,17 +1,23 @@
-using EasyTourChoice.API.Models;
+using EasyTourChoice.API.Entities;
 
 namespace EasyTourChoice.API.Services;
 
 public class TourDataRepository : ITourDataRepository
 {
-    public IEnumerable<TourDataDto> GetAll()
+    public IEnumerable<TourData> GetAll()
     {
         return [];
     }
 
-    public IEnumerable<TourDataDto> GetAllByActivity(Activity activity)
+    public IEnumerable<TourData> GetAllByActivity(Activity activity)
     {
         return [];
+    }
+
+    public TourData GetTourData(int id)
+    {
+        var tourData = new TourData() { Name = string.Empty};
+        return tourData;
     }
 
 }
