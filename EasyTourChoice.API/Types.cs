@@ -57,6 +57,16 @@ public enum GeneralDifficulty
     VERY_CHALLENING
 }
 
+// uses a bitmap to allow for a combination of different aspects in a single field through an OR operation
+public enum Aspect
+{
+    UNKNOWN = 0,
+    NORTH = 1,
+    EAST = 2,
+    SOUTH = 4,
+    WEST = 8,
+}
+
 // climbing & boldering scales
 public enum VScale
 {

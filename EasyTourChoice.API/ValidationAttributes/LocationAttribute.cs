@@ -41,6 +41,6 @@ sealed public class LocationAttribute : ValidationAttribute
         var msg = string.Format("Longitude, latitude and altitude have to be valid floating point numbers in the ranges "
                 + " [{0}, {1}], [{2}, {3}], and [{4}, {5}], respectively.",
                 _minLongitude, _maxLongitude, _minLatitude, _maxLatitude, _minAltitude, _maxAltitude);
-          return msg;
+        return msg;
     }
 }

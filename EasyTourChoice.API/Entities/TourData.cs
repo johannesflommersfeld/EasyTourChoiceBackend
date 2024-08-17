@@ -34,11 +34,17 @@ public class TourData
 
     public int? MetersOfElevation { get; set; }
 
+    public int? Distance { get; set; } // total distance of the activity in km
+
+    [MaxLength(120)]
     public string? ShortDescription { get; set; }
 
     public GeneralDifficulty? Difficulty { get; set; } // unit depends on the type of activity
 
     public RiskLevel? Risk { get; set; } // categories depend on the type of activity
+
+    [Aspect]
+    public byte? Aspect { get; set; } // encodes the encountered aspects (see definition in Types.cs)
 
     public Area? Area { get; set; }
 
