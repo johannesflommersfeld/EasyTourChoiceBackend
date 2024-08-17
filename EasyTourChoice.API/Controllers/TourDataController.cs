@@ -51,9 +51,13 @@ public class TourDataController(
     [HttpPost]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public ActionResult<TourDataDto> CreateTourData(TourDataForCreationDto tour)
     {
         var tourData = _mapper.Map<TourData>(tour);
+
+        if (!TryValidateModel(tourData))
+            return BadRequest(ModelState);
 
         var tourDataForResponse = _mapper.Map<TourDataDto>(tourData);
         return Created("GetTourData", tourDataForResponse);
