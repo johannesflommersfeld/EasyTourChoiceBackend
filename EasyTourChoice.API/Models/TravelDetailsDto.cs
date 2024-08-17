@@ -1,3 +1,3 @@
 namespace EasyTourChoice.API.Models;
 
-public class WeatherForecastDto;
+public class TravelDetailsDto;
