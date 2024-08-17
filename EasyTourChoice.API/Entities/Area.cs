@@ -10,6 +10,7 @@ public class Area
     public int AreaId { get; set; }
 
     [Required]
+    [MaxLength(50)]
     public required string Name { get; set; }
 
     public ICollection<TourData> Tours { get; set; } = [];

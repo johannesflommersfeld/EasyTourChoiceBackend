@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<ITourDataRepository, TourDataRepository>();
+builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 
 builder.Services.AddAutoMapper(typeof(TourDataProfile));
 
