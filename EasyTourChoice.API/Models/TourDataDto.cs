@@ -21,6 +21,8 @@ public class TourDataDto
 
     public float? ApproachDuration { get; set; } // expected approach time in hours
 
+    public int? MetersOfElevation { get; set; }
+
     public string? ShortDescription { get; set; }
 
     public GeneralDifficulty? Difficulty { get; set; } // unit depends on the type of activity

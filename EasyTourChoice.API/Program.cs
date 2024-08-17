@@ -1,12 +1,13 @@
+using EasyTourChoice.API.DbContexts;
 using EasyTourChoice.API.Profiles;
 using EasyTourChoice.API.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<ITourDataRepository, TourDataRepository>();
-
 
 builder.Services.AddAutoMapper(typeof(TourDataProfile));
 
@@ -16,6 +17,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+
+builder.Services.AddDbContext<TourDataContext>(dbContextOptions => 
+    dbContextOptions.UseSqlite(builder.Configuration["ETC_CONNECTIONSTRING"]));
 
 var app = builder.Build();
 
