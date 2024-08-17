@@ -1,4 +1,4 @@
-using EasyTourChoice.API.Mappings;
+using EasyTourChoice.API.Profiles;
 using EasyTourChoice.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +8,7 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<ITourDataRepository, TourDataRepository>();
 
 
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(typeof(TourDataProfile));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

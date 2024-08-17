@@ -2,10 +2,10 @@ using AutoMapper;
 using EasyTourChoice.API.Entities;
 using EasyTourChoice.API.Models;
 
-namespace EasyTourChoice.API.Mappings;
-public class MappingProfile : Profile
+namespace EasyTourChoice.API.Profiles;
+public class TourDataProfile : Profile
 {
-    public MappingProfile()
+    public TourDataProfile()
     {
         CreateMap<TourDataForCreationDto, TourData>();
         CreateMap<TourData, TourDataDto>();
