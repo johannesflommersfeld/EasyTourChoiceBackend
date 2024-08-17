@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using EasyTourChoice.API.Entities;
 
 namespace EasyTourChoice.API.Models;
 
@@ -13,9 +12,9 @@ public class TourDataDto
 
     public Activity ActivityType { get; set; }
 
-    public LocationDto? StartingLocation { get; set; }
+    public uint? StartingLocationId { get; set; }
 
-    public LocationDto? ActivityLocation { get; set; }
+    public uint? ActivityLocationId { get; set; }
 
     public float? Duration { get; set; } // expected activity time in hours
 
@@ -34,7 +33,7 @@ public class TourDataDto
 
     public byte? Aspect { get; set; } // encodes the encountered aspects (see definition in Types.cs)
 
-    public AreaDto? Area { get; set; }
+    public uint? AreaId { get; set; }
 
     // derived fields
     public float? TravelTime { get; set; } // estimated travel time in hours
