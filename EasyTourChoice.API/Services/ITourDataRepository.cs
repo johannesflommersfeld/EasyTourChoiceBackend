@@ -1,11 +1,11 @@
-using EasyTourChoice.API.Models;
+using EasyTourChoice.API.Entities;
 
 namespace EasyTourChoice.API.Services;
 
 public interface ITourDataRepository
 {
-    IEnumerable<TourDataDto> GetAll();
-    IEnumerable<TourDataDto> GetAllByActivity(Activity activity);
-
+    IEnumerable<TourData> GetAll();
+    IEnumerable<TourData> GetAllByActivity(Activity activity);
+    TourData GetTourData(int id);
 }
 

@@ -26,13 +26,26 @@ public enum RiskLevel
     DANGEROUS,
 }
 
-public enum AvelanchRisk
+public enum AvelancheRisk
 {
+    UNKNOWN,
     LOW,
     MODERATE,
     CONSIDERABLE,
     HIGH,
     VERY_HIGH,
+}
+
+public enum WeatherPreview
+{
+    UNKNOWN,
+    THUNDERSTORM,
+    HEAVY_RAIN,
+    RAIN,
+    CLOUDY,
+    PARTIALLY_SUNNY,
+    PARTIALLY_SUNNY_WITH_RAIN,
+    SUNNY,
 }
 
 public enum GeneralDifficulty
@@ -44,6 +57,7 @@ public enum GeneralDifficulty
     VERY_CHALLENING
 }
 
+// climbing & boldering scales
 public enum VScale
 {
     UNKNOWN,
