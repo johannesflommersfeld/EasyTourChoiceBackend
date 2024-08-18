@@ -17,4 +17,14 @@ public class AreaRepository(TourDataContext context) : IAreaRepository
     {
         return await _context.Areas.Include(a => a.Tours).Where(t => t.AreaId == id).FirstOrDefaultAsync();
     }
+
+    public async Task<bool> AreaExistsAsync(int id)
+    {
+        return await _context.Areas.AnyAsync(l => l.AreaId == id);
+    }
+
+    public async Task<bool> SaveChangesAsync()
+    {
+        return await _context.SaveChangesAsync() >= 0;
+    }
 }

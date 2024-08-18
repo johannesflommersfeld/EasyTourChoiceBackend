@@ -3,6 +3,7 @@ using EasyTourChoice.API.Services;
 using EasyTourChoice.API.Models;
 using AutoMapper;
 using EasyTourChoice.API.Entities;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace EasyTourChoice.API.Controllers;
 
@@ -22,7 +23,6 @@ public class TourDataController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourData()
     {
-        _logger.LogInformation("All tour data was requested");
         var tourData = await _tourDataRepository.GetAllToursAsync();
         // TODO: include the previews of weather, avalanche, and travel reports
 
@@ -33,7 +33,6 @@ public class TourDataController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourDataByActivity(Activity activity)
     {
-        _logger.LogInformation("Activity-specific tour data was requested");
         var tourData = await _tourDataRepository.GetToursByActivityAsync(activity);
         // TODO: include the previews of weather, avalanche, and travel reports
 
@@ -44,7 +43,6 @@ public class TourDataController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourDataByArea(int areaId)
     {
-        _logger.LogInformation("Area-specific tour data was requested");
         var tourData = await _tourDataRepository.GetToursByAreaAsync(areaId);
 
         return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
@@ -55,7 +53,6 @@ public class TourDataController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetTourData(int tourId, bool useTraffic)
     {
-        _logger.LogInformation("Specific tour data was requested");
         var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
 
         if (tourData is null)
@@ -70,17 +67,54 @@ public class TourDataController(
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<TourDataDto> CreateTourData(TourDataForCreationDto tour)
+    public async Task<ActionResult<TourDataDto>> CreateTourData(TourDataForCreationDto tour)
     {
-        // TODO: connect to Database
         var tourData = _mapper.Map<TourData>(tour);
 
         if (!TryValidateModel(tourData))
             return BadRequest(ModelState);
+        
+        await _tourDataRepository.AddTourAsync(tourData);
+        await _tourDataRepository.SaveChangesAsync();
 
         var tourDataForResponse = _mapper.Map<TourDataDto>(tourData);
+
+        string msg = string.Format("New tour with id {0} was added", tourData.Id);
+        _logger.LogInformation("{msg}", msg);
         return Created("GetTourData", tourDataForResponse);
     }
 
-    // TODO: add patch functionality
+    [HttpPatch("{tourId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateTourData(int tourId,
+           JsonPatchDocument<TourDataForUpdateDto> patchDocument)
+    {
+        if (!await _tourDataRepository.TourDataExistsAsync(tourId))
+            return NotFound();
+
+        var tour = await _tourDataRepository.GetTourByIdAsync(tourId);
+        if (tour == null)
+            return NotFound();
+
+        var tourToPatch = _mapper.Map<TourDataForUpdateDto>(tour);
+        patchDocument.ApplyTo(tourToPatch, ModelState);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        if (!TryValidateModel(tourToPatch))
+            return BadRequest(ModelState);
+        
+        _mapper.Map(tourToPatch, tour);
+        await _tourDataRepository.SaveChangesAsync();
+
+        string msg = string.Format("Tour {0} was updated", tourId);
+        _logger.LogInformation("{msg}", msg);
+        return NoContent();
+    }
+
+    // TODO: add delete functionality. Areas and locations should automatically be deleted 
+    // if they are no longer referenced by any tour
 }

@@ -7,7 +7,9 @@ public class TourDataProfile : Profile
 {
     public TourDataProfile()
     {
-        CreateMap<TourDataForCreationDto, TourData>();
         CreateMap<TourData, TourDataDto>();
+        CreateMap<TourDataForCreationDto, TourData>();
+        CreateMap<TourDataForUpdateDto, TourData>();
+        CreateMap<TourData, TourDataForUpdateDto>();
     }
 }

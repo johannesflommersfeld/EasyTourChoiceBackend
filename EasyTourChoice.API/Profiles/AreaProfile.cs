@@ -10,6 +10,8 @@ public class AreaProfile : Profile
         CreateMap<Area, AreaDto>()
             .ForMember(dest => dest.NumberOfTours, opt => opt.MapFrom<TourNumberResolver>());
         CreateMap<AreaForCreationDto, Area>();
+        CreateMap<AreaForUpdateDto, Area>();
+        CreateMap<Area, AreaForUpdateDto>();
     }
 }
 

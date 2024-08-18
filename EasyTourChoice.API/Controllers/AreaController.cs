@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using EasyTourChoice.API.Services;
 using EasyTourChoice.API.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace EasyTourChoice.API.Controllers;
 
@@ -27,7 +28,7 @@ public class AreaController(
         return Ok(_mapper.Map<IList<AreaDto>>(areaList));
     }
 
-    [HttpGet("areas/{areaId}")]
+    [HttpGet("{areaId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<AreaDto>>> GetArea(int areaId)
@@ -41,5 +42,34 @@ public class AreaController(
         return Ok(_mapper.Map<AreaDto>(area));
     }
 
-    // TODO: add create and patch functionality
+    [HttpPatch("{areaId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateArea(int areaID,
+           JsonPatchDocument<AreaForUpdateDto> patchDocument)
+    {
+        if (!await _areaRepository.AreaExistsAsync(areaID))
+            return NotFound();
+
+        var area = await _areaRepository.GetAreaByIdAsync(areaID);
+        if (area == null)
+            return NotFound();
+
+        var areaToPatch = _mapper.Map<AreaForUpdateDto>(area);
+        patchDocument.ApplyTo(areaToPatch, ModelState);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        if (!TryValidateModel(areaToPatch))
+            return BadRequest(ModelState);
+        
+        _mapper.Map(areaToPatch, area);
+        await _areaRepository.SaveChangesAsync();
+
+        string msg = string.Format("Area {0} was updated", areaID);
+        _logger.LogInformation("{msg}", msg);
+        return NoContent();
+    }
 }
