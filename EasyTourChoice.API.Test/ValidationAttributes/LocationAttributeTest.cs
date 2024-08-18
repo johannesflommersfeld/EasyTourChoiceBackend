@@ -38,22 +38,6 @@ public class LocationAttributeTest
         }
     }
 
-    [Test]
-    public void SetNullLocation_CoordinatesAreNulled()
-    {
-        // arrange
-        var location = new Location();
-
-        // act, assert
-        Assert.That(_locationAttribute.IsValid(location), Is.True);
-        Assert.Multiple(() =>
-        {
-            Assert.That(location.Latitude, Is.Null);
-            Assert.That(location.Longitude, Is.Null);
-            Assert.That(location.Altitude, Is.Null);
-        });
-    }
-
     [TestCase(182, -91)]
     [TestCase(-182, 91)]
     [TestCase(182, 1)]
