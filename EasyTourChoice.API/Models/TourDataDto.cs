@@ -9,7 +9,7 @@ public class TourDataDto : TourBase
     // derived fields
     public float? TravelTime { get; set; } // estimated travel time in hours
 
-    public TravelDetailsDto? TravelDetails {get; set;}
+    public TravelInformationDto? TravelDetails {get; set;}
 
     public WeatherPreview? WeatherPreview { get; set; }
 

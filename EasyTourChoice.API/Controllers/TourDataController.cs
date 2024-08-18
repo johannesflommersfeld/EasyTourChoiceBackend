@@ -11,12 +11,14 @@ namespace EasyTourChoice.API.Controllers;
 [Route("api/tourData")]
 public class TourDataController(
     ITourDataRepository tourDataRepository,
+    ILocationRepository locationRepository,
     ILogger<TourDataController> logger,
     IMapper mapper
     ) : ControllerBase
 {
     private readonly ILogger<TourDataController> _logger = logger;
     private readonly ITourDataRepository _tourDataRepository = tourDataRepository;
+    private readonly ILocationRepository _locationRepository = locationRepository;
     private readonly IMapper _mapper = mapper;
 
     [HttpGet]
@@ -51,23 +53,54 @@ public class TourDataController(
     [HttpGet("tours/{tourId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetTourData(int tourId, bool useTraffic)
+    public async Task<ActionResult<TourDataDto>> GetTourData(int tourId,
+        [FromKeyedServices("OSRM")] ITravelPlanningService travelService, Location? userLocation)
+    {
+        var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
+
+        if (tourData is null)
+            return NotFound();
+        
+        var tourDataDto = await GetTourData(tourData, travelService, userLocation);
+
+        return Ok(tourDataDto);
+    }
+
+    [HttpGet("tours/{tourId}/traffic")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetTourDataWithTraffic(int tourId,
+        [FromKeyedServices("TomTom")] ITravelPlanningService travelService, Location? userLocation)
     {
         var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
 
         if (tourData is null)
             return NotFound();
 
-        // TODO: include the full travel, weather and avalanche details
+        var tourDataDto = await GetTourData(tourData, travelService, userLocation);
 
-        return Ok(_mapper.Map<TourDataDto>(tourData));
+        return Ok(tourDataDto);
+    }
+
+    private async Task<TourDataDto> GetTourData(TourData tourData, ITravelPlanningService travelService, Location? userLocation)
+    {
+        // TODO: include the full travel, weather and avalanche details
+        var tourDataDto = _mapper.Map<TourDataDto>(tourData);
+        var targetLocation = await _locationRepository.GetLocationAsync(tourDataDto.StartingLocationId);
+        if (userLocation != null && targetLocation != null)
+        {
+            var travelInfo = await travelService.GetLongTravelInfoAsync(userLocation, targetLocation);
+            tourDataDto.TravelTime = travelInfo.TravelTime;
+            tourDataDto.TravelDetails = travelInfo;
+        }
+        return tourDataDto;
     }
 
     [HttpPost]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<TourDataDto>> CreateTourData(TourDataForCreationDto tour)
+    public async Task<ActionResult<TourDataDto>> CreateTourDataWithoutTraffic(TourDataForCreationDto tour)
     {
         var tourData = _mapper.Map<TourData>(tour);
 

@@ -9,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<ITourDataRepository, TourDataRepository>();
 builder.Services.AddScoped<IAreaRepository, AreaRepository>();
+// TODO: replace key strings by enums
+builder.Services.AddKeyedScoped<ITravelPlanningService, OSRMTravelPlanningService>("OSRM");
+builder.Services.AddKeyedScoped<ITravelPlanningService, TomTomTravelPlanningService>("TomTom");
 
 builder.Services.AddAutoMapper(typeof(TourDataProfile));
 
