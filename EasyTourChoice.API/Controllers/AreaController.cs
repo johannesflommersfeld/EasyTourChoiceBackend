@@ -36,6 +36,8 @@ public class AreaController(
         _logger.LogInformation("Specific tour data was requested");
         var area = await _areaRepository.GetAreaByIdAsync(areaId);
 
+        // include weather and avalanche information
+
         if (area is null)
             return NotFound();
 

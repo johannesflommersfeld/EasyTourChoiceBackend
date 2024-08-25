@@ -1,10 +1,15 @@
+using System.Text.Json.Serialization;
+
 namespace EasyTourChoice.API.Models.BaseModels;
 
 public class LocationBase : IEquatable<object>
 {
-    public double Latitude { get; init; } // latitude with decimal minutes
-    public double Longitude { get; init; } // longitude with decimal minutes
-    public double? Altitude { get; init; } // altitude in meter
+    [property: JsonPropertyName("latitude")]
+    public double Latitude { get; set; } // latitude with decimal minutes
+
+    [property: JsonPropertyName("longitude")]
+    public double Longitude { get; set; } // longitude with decimal minutes
+    public double? Altitude { get; set; } // altitude in meter
 
     // according to https://en.wikipedia.org/wiki/Decimal_degrees,
     // this should be precise enough for our purposes (+/- 10 m)

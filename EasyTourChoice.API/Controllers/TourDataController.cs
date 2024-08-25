@@ -23,10 +23,11 @@ public class TourDataController(
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourData()
+    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourData(
+        [FromKeyedServices("OSRM")] ITravelPlanningService travelService)
     {
         var tourData = await _tourDataRepository.GetAllToursAsync();
-        // TODO: include the previews of weather, avalanche, and travel reports
+        // TODO: only include travel time and distance
 
         return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
     }
@@ -36,7 +37,7 @@ public class TourDataController(
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourDataByActivity(Activity activity)
     {
         var tourData = await _tourDataRepository.GetToursByActivityAsync(activity);
-        // TODO: include the previews of weather, avalanche, and travel reports
+        // TODO: only include travel time and distance
 
         return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
     }
@@ -54,8 +55,14 @@ public class TourDataController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TourDataDto>> GetTourData(int tourId,
-        [FromKeyedServices("OSRM")] ITravelPlanningService travelService, Location? userLocation)
+        [FromKeyedServices("OSRM")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
     {
+        Location userLocation = new ();
+        if (userLatitude is not null && userLongitude is not null)
+        {
+            userLocation.Latitude = (double)userLatitude;
+            userLocation.Longitude = (double)userLongitude;
+        }
         var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
 
         if (tourData is null)
@@ -70,8 +77,14 @@ public class TourDataController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetTourDataWithTraffic(int tourId,
-        [FromKeyedServices("TomTom")] ITravelPlanningService travelService, Location? userLocation)
+        [FromKeyedServices("TomTom")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
     {
+        Location userLocation = new ();
+        if (userLatitude is not null && userLongitude is not null)
+        {
+            userLocation.Latitude = (double)userLatitude;
+            userLocation.Longitude = (double)userLongitude;
+        }
         var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
 
         if (tourData is null)
@@ -84,13 +97,11 @@ public class TourDataController(
 
     private async Task<TourDataDto> GetTourData(TourData tourData, ITravelPlanningService travelService, Location? userLocation)
     {
-        // TODO: include the full travel, weather and avalanche details
         var tourDataDto = _mapper.Map<TourDataDto>(tourData);
         var targetLocation = await _locationRepository.GetLocationAsync(tourDataDto.StartingLocationId);
         if (userLocation != null && targetLocation != null)
         {
             var travelInfo = await travelService.GetLongTravelInfoAsync(userLocation, targetLocation);
-            tourDataDto.TravelTime = travelInfo.TravelTime;
             tourDataDto.TravelDetails = travelInfo;
         }
         return tourDataDto;

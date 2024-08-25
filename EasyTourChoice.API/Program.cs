@@ -2,6 +2,7 @@ using EasyTourChoice.API.DbContexts;
 using EasyTourChoice.API.Profiles;
 using EasyTourChoice.API.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,11 +10,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<ITourDataRepository, TourDataRepository>();
 builder.Services.AddScoped<IAreaRepository, AreaRepository>();
+builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 // TODO: replace key strings by enums
 builder.Services.AddKeyedScoped<ITravelPlanningService, OSRMTravelPlanningService>("OSRM");
 builder.Services.AddKeyedScoped<ITravelPlanningService, TomTomTravelPlanningService>("TomTom");
 
 builder.Services.AddAutoMapper(typeof(TourDataProfile));
+builder.Services.AddHttpClient();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
