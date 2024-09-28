@@ -19,8 +19,8 @@ sealed public class LocationAttribute : ValidationAttribute
             return false;
 
         var location = (Location)value;
-        if ((location.Latitude != null && double.IsNaN((double)location.Latitude)) ||
-            (location.Longitude != null && double.IsNaN((double)location.Longitude)) ||
+        if (double.IsNaN((double)location.Latitude) ||
+            double.IsNaN((double)location.Longitude) ||
             (location.Altitude != null && double.IsNaN((double)location.Altitude)))
         {
             return false;

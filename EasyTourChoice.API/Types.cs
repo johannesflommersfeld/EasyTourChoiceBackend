@@ -61,10 +61,22 @@ public enum GeneralDifficulty
 public enum Aspect
 {
     UNKNOWN = 0,
-    NORTH = 1,
-    EAST = 2,
-    SOUTH = 4,
-    WEST = 8,
+    [System.Runtime.Serialization.EnumMember(Value = @"N")]
+    NORTH = 0b0000_0001,
+    [System.Runtime.Serialization.EnumMember(Value = @"NE")]
+    NORTH_EAST = 0b0000_0010,
+    [System.Runtime.Serialization.EnumMember(Value = @"E")]
+    EAST = 0b0000_0100,
+    [System.Runtime.Serialization.EnumMember(Value = @"SE")]
+    SOUTH_EAST = 0b0000_1000,
+    [System.Runtime.Serialization.EnumMember(Value = @"S")]
+    SOUTH = 0b0001_0000,
+    [System.Runtime.Serialization.EnumMember(Value = @"SW")]
+    SOUTH_WEST = 0b0010_0000,
+    [System.Runtime.Serialization.EnumMember(Value = @"W")]
+    WEST = 0b0100_0000,
+    [System.Runtime.Serialization.EnumMember(Value = @"NW")]
+    NORTH_WEST = 0b1000_0000,
 }
 
 // climbing & boldering scales

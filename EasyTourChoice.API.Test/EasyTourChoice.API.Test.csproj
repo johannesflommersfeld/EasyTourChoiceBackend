@@ -21,4 +21,12 @@
     <ProjectReference Include="..\EasyTourChoice.API\EasyTourChoice.API.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="resources/*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+
+
 </Project>

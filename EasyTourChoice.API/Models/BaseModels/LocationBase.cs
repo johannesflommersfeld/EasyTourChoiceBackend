@@ -19,13 +19,13 @@ public class LocationBase : IEquatable<object>
     {
         if (obj == null || GetType() != obj.GetType())
             return false;
-        
+
         var loc = (LocationBase)obj;
-        return Math.Abs(Latitude - loc.Latitude) < _locationTolerance && 
-               Math.Abs(Longitude - loc.Longitude) < _locationTolerance; 
+        return Math.Abs(Latitude - loc.Latitude) < _locationTolerance &&
+               Math.Abs(Longitude - loc.Longitude) < _locationTolerance;
     }
 
-    public static bool operator == (LocationBase? loc1, LocationBase? loc2)
+    public static bool operator ==(LocationBase? loc1, LocationBase? loc2)
     {
         if (loc1 is null)
             return loc2 is null;
@@ -33,7 +33,7 @@ public class LocationBase : IEquatable<object>
         return loc1.Equals(loc2);
     }
 
-    public static bool operator != (LocationBase? loc1, LocationBase? loc2)
+    public static bool operator !=(LocationBase? loc1, LocationBase? loc2)
     {
         return !(loc1 == loc2);
     }

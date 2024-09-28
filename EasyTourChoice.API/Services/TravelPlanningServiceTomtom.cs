@@ -3,7 +3,7 @@ using EasyTourChoice.API.Models;
 
 namespace EasyTourChoice.API.Services;
 
-public class TomTomTravelPlanningService : ITravelPlanningService
+public class TravelPlanningServiceTomTom : ITravelPlanningService
 {
     public Task<TravelInformationDto> GetShortTravelInfoAsync(Location currentLocation, Location targetLocation)
     {

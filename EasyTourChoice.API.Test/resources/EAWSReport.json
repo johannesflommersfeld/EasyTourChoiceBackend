@@ -1,0 +1,381 @@
+{
+  "bulletins": [
+    {
+      "publicationTime": "2024-05-04T15:00:00Z",
+      "validTime": {
+        "startTime": "2024-05-04T22:00:00Z",
+        "endTime": "2024-05-05T22:00:00Z"
+      },
+      "unscheduled": false,
+      "weatherForecast": {},
+      "avalancheActivity": {
+        "highlights": "Nass- und Gleitschneelawinen sind immer noch vereinzelt möglich.",
+        "comment": "Es sind einzelne Nass- und Gleitschneelawinen möglich. Lawinen können sehr vereinzelt die durchnässte Schneedecke mitreißen und eine gefährliche Größe erreichen. Mit der tageszeitlichen Erwärmung und der Sonneneinstrahlung sind nur noch vereinzelt Lockerschneelawinen zu erwarten, besonders im felsdurchsetzten Steilgelände an allen Expositionen. <br/> Einzelne Gefahrenstellen für trockene Lawinen liegen im extremen Steilgelände in hohen Lagen und im Hochgebirge. Nebst der Verschüttungsgefahr sollte auch die Mitreiß- und Absturzgefahr beachtet werden. <br/> <br/> Der Lawinenwarndienst hat derzeit wenig Informationen aus dem Gelände, weshalb die Lawinengefahr vor Ort besonders gründlich überprüft werden sollte."
+      },
+      "snowpackStructure": {
+        "comment": "Hochgebirge: Mit teils starkem Wind aus wechselnden Richtungen entstanden vor allem in Rinnen, Mulden und hinter Geländekanten Triebschneeansammlungen. Die Bedingungen bewirken eine Stabilisierung der Triebschneeansammlungen. Hohe Lagen: Die Wetterbedingungen führen zu einer zunehmenden Durchnässung der Schneedecke."
+      },
+      "travelAdvisory": {},
+      "tendency": [
+        {
+          "highlights": "Einzelne Gefahrenstellen für trockene Lawinen liegen im extremen Steilgelände. Es sind einzelne Nass- und Gleitschneelawinen möglich. <br/> <br/>  Dies ist der letzte Lawinenreport des Winters 2023/24. Aktuelle Informationen und Mitteilungen werden in unserem Blog veröffentlicht.",
+          "tendencyType": "steady",
+          "validTime": {
+            "startTime": "2024-05-05T22:00:00Z",
+            "endTime": "2024-05-06T22:00:00Z"
+          }
+        }
+      ],
+      "customData": {
+        "ALBINA": {
+          "mainDate": "2024-05-05"
+        },
+        "LWD_Tyrol": {
+          "dangerPatterns": []
+        }
+      },
+      "avalancheProblems": [
+        {
+          "problemType": "wet_snow",
+          "elevation": {
+            "upperBound": "2800"
+          },
+          "validTimePeriod": "all_day",
+          "snowpackStability": "very_poor",
+          "frequency": "few",
+          "avalancheSize": 2,
+          "aspects": [
+            "SW",
+            "N",
+            "NE",
+            "E",
+            "NW",
+            "SE",
+            "W",
+            "S"
+          ]
+        }
+      ],
+      "bulletinID": "3053b6ea-820b-4f29-a35a-16049e89c2ed",
+      "dangerRatings": [
+        {
+          "mainValue": "moderate",
+          "elevation": {
+            "upperBound": "2800"
+          },
+          "validTimePeriod": "all_day"
+        },
+        {
+          "mainValue": "low",
+          "elevation": {
+            "lowerBound": "2800"
+          },
+          "validTimePeriod": "all_day"
+        }
+      ],
+      "lang": "de",
+      "regions": [
+        {
+          "name": "Grödner Dolomiten",
+          "regionID": "IT-32-BZ-18-02"
+        },
+        {
+          "name": "Lüsner Berge",
+          "regionID": "IT-32-BZ-18-01"
+        },
+        {
+          "name": "Sextner Dolomiten",
+          "regionID": "IT-32-BZ-20"
+        },
+        {
+          "name": "Hinteres Ahrntal",
+          "regionID": "IT-32-BZ-05-03"
+        },
+        {
+          "name": "Südliche Zillertaler Alpen",
+          "regionID": "IT-32-BZ-05-02"
+        },
+        {
+          "name": "Pfitsch",
+          "regionID": "IT-32-BZ-05-01"
+        },
+        {
+          "name": "Schnalser Kamm",
+          "regionID": "IT-32-BZ-03"
+        },
+        {
+          "name": "Südliche Sesvenna Gruppe",
+          "regionID": "IT-32-BZ-01-02"
+        },
+        {
+          "name": "Nördliche Sesvenna Gruppe",
+          "regionID": "IT-32-BZ-01-01"
+        },
+        {
+          "name": "Saldurn-Mastaun Kamm",
+          "regionID": "IT-32-BZ-06"
+        },
+        {
+          "name": "Hirzergruppe",
+          "regionID": "IT-32-BZ-08-01"
+        },
+        {
+          "name": "Westliche Pfunderer Berge",
+          "regionID": "IT-32-BZ-09"
+        },
+        {
+          "name": "Jakobspitzegruppe",
+          "regionID": "IT-32-BZ-08-02"
+        },
+        {
+          "name": "Südliche Sarntaler Alpen",
+          "regionID": "IT-32-BZ-08-03"
+        },
+        {
+          "name": "Östliche Pfunderer Berge",
+          "regionID": "IT-32-BZ-10"
+        },
+        {
+          "name": "Durreckgruppe",
+          "regionID": "IT-32-BZ-11"
+        },
+        {
+          "name": "Langtaufers",
+          "regionID": "IT-32-BZ-02-01"
+        },
+        {
+          "name": "Ratschings",
+          "regionID": "IT-32-BZ-04-02"
+        },
+        {
+          "name": "Südliche Stubaier Alpen",
+          "regionID": "IT-32-BZ-04-01"
+        },
+        {
+          "name": "Rieserfernergruppe",
+          "regionID": "IT-32-BZ-12"
+        },
+        {
+          "name": "Westliche Deferegger Alpen",
+          "regionID": "IT-32-BZ-13"
+        },
+        {
+          "name": "Ortlergruppe",
+          "regionID": "IT-32-BZ-14"
+        },
+        {
+          "name": "Ultental",
+          "regionID": "IT-32-BZ-15"
+        },
+        {
+          "name": "Planeilerberge",
+          "regionID": "IT-32-BZ-02-02"
+        },
+        {
+          "name": "Östliche Nonsberger Alpen",
+          "regionID": "IT-32-BZ-16"
+        },
+        {
+          "name": "Nördliche Fleimstaler Alpen",
+          "regionID": "IT-32-BZ-17"
+        },
+        {
+          "name": "Pragser Dolomiten",
+          "regionID": "IT-32-BZ-19"
+        },
+        {
+          "name": "Hinteres Passeiertal",
+          "regionID": "IT-32-BZ-07-01"
+        },
+        {
+          "name": "Texelgruppe",
+          "regionID": "IT-32-BZ-07-02"
+        }
+      ]
+    },
+    {
+      "publicationTime": "2024-05-04T15:00:00Z",
+      "validTime": {
+        "startTime": "2024-05-04T22:00:00Z",
+        "endTime": "2024-05-05T22:00:00Z"
+      },
+      "unscheduled": false,
+      "weatherForecast": {},
+      "avalancheActivity": {
+        "highlights": "In den letzten Tagen entstanden im Hochgebirge Triebschneeansammlungen. Sie bilden die Hauptgefahr. Unterhalb von rund 2600 m sind meist kleine feuchte Lockerschneerutsche möglich.",
+        "comment": "Neu- und Triebschnee der letzten Tage müssen an allen Expositionen oberhalb von rund 2600 m vorsichtig beurteilt werden. Lawinen können mittlere Größe erreichen. Diese können stellenweise mit geringer Belastung ausgelöst werden, besonders in Kammlagen, Rinnen und Mulden. <br/> Mit der tageszeitlichen Erwärmung und der Sonneneinstrahlung sind im Tagesverlauf Nass- und Gleitschneelawinen möglich, besonders an steilen Hängen unterhalb von rund 2600 m an allen Expositionen."
+      },
+      "snowpackStructure": {
+        "comment": "Mit Südostwind entstanden in den letzten Tagen im Hochgebirge Triebschneeansammlungen. Sonne und Wärme führen im Tagesverlauf zu einer allmählichen Durchnässung der Schneedecke."
+      },
+      "travelAdvisory": {},
+      "tendency": [
+        {
+          "highlights": "Mit der Erwärmung sind im Tagesverlauf Lockerschneelawinen zu erwarten, besonders im felsdurchsetzten Steilgelände an allen Expositionen.",
+          "tendencyType": "steady",
+          "validTime": {
+            "startTime": "2024-05-05T22:00:00Z",
+            "endTime": "2024-05-06T22:00:00Z"
+          }
+        }
+      ],
+      "customData": {
+        "ALBINA": {
+          "mainDate": "2024-05-05"
+        },
+        "LWD_Tyrol": {
+          "dangerPatterns": [
+            "DP6",
+            "DP10"
+          ]
+        }
+      },
+      "avalancheProblems": [
+        {
+          "problemType": "wind_slab",
+          "elevation": {
+            "lowerBound": "2600"
+          },
+          "validTimePeriod": "all_day",
+          "snowpackStability": "poor",
+          "frequency": "some",
+          "avalancheSize": 2,
+          "aspects": [
+            "SW",
+            "N",
+            "NE",
+            "E",
+            "NW",
+            "SE",
+            "W",
+            "S"
+          ]
+        },
+        {
+          "problemType": "wet_snow",
+          "elevation": {
+            "upperBound": "2600"
+          },
+          "validTimePeriod": "all_day",
+          "snowpackStability": "poor",
+          "frequency": "few",
+          "avalancheSize": 1,
+          "aspects": [
+            "SW",
+            "N",
+            "NE",
+            "E",
+            "SE",
+            "NW",
+            "W",
+            "S"
+          ]
+        }
+      ],
+      "bulletinID": "024a57d4-f723-4088-9aad-a480056d9b4b",
+      "dangerRatings": [
+        {
+          "mainValue": "low",
+          "elevation": {
+            "upperBound": "2600"
+          },
+          "validTimePeriod": "all_day"
+        },
+        {
+          "mainValue": "moderate",
+          "elevation": {
+            "lowerBound": "2600"
+          },
+          "validTimePeriod": "all_day"
+        }
+      ],
+      "lang": "de",
+      "regions": [
+        {
+          "name": "Latemar",
+          "regionID": "IT-32-TN-09"
+        },
+        {
+          "name": "Südlicher Adamello",
+          "regionID": "IT-32-TN-02"
+        },
+        {
+          "name": "Primiero - Pale di S. Martino",
+          "regionID": "IT-32-TN-13"
+        },
+        {
+          "name": "Adamello - Presanella",
+          "regionID": "IT-32-TN-01"
+        },
+        {
+          "name": "Prealpi",
+          "regionID": "IT-32-TN-12"
+        },
+        {
+          "name": "Nördliche Brenta - Peller",
+          "regionID": "IT-32-TN-04"
+        },
+        {
+          "name": "Cimberntal",
+          "regionID": "IT-32-TN-15"
+        },
+        {
+          "name": "Bondone und Stivo",
+          "regionID": "IT-32-TN-03"
+        },
+        {
+          "name": "Vallarse",
+          "regionID": "IT-32-TN-14"
+        },
+        {
+          "name": "Westliche Nonsberger Alpen",
+          "regionID": "IT-32-TN-17"
+        },
+        {
+          "name": "Folgaria - Lavarone",
+          "regionID": "IT-32-TN-06"
+        },
+        {
+          "name": "Südliche Brenta",
+          "regionID": "IT-32-TN-05"
+        },
+        {
+          "name": "Fassatal",
+          "regionID": "IT-32-TN-16"
+        },
+        {
+          "name": "Sole, Pejo und Rabbi",
+          "regionID": "IT-32-TN-19"
+        },
+        {
+          "name": "Südliche Lagorai",
+          "regionID": "IT-32-TN-08"
+        },
+        {
+          "name": "Ledrotal",
+          "regionID": "IT-32-TN-18"
+        },
+        {
+          "name": "Nördliche Lagorai",
+          "regionID": "IT-32-TN-07"
+        },
+        {
+          "name": "Maddalene",
+          "regionID": "IT-32-TN-20"
+        },
+        {
+          "name": "Paganella",
+          "regionID": "IT-32-TN-11"
+        },
+        {
+          "name": "Marzola - Valsugana",
+          "regionID": "IT-32-TN-10"
+        },
+        {
+          "name": "Pine' - Fersental",
+          "regionID": "IT-32-TN-21"
+        }
+      ]
+    }
+  ]
+}

@@ -66,7 +66,7 @@ public class AreaController(
 
         if (!TryValidateModel(areaToPatch))
             return BadRequest(ModelState);
-        
+
         _mapper.Map(areaToPatch, area);
         await _areaRepository.SaveChangesAsync();
 

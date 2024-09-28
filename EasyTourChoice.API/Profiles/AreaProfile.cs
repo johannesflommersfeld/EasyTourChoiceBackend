@@ -17,8 +17,8 @@ public class AreaProfile : Profile
 
 public class TourNumberResolver : IValueResolver<Area, AreaDto, uint>
 {
-	public uint Resolve(Area source, AreaDto destination, uint member, ResolutionContext context)
-	{
+    public uint Resolve(Area source, AreaDto destination, uint member, ResolutionContext context)
+    {
         return (uint)source.Tours.Count;
-	}
+    }
 }

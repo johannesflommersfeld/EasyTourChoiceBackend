@@ -13,13 +13,17 @@ public class TourDataController(
     ITourDataRepository tourDataRepository,
     ILocationRepository locationRepository,
     ILogger<TourDataController> logger,
-    IMapper mapper
+    IMapper mapper,
+    EAWSRegionService regionService,
+    EAWSReportService reportService
     ) : ControllerBase
 {
     private readonly ILogger<TourDataController> _logger = logger;
     private readonly ITourDataRepository _tourDataRepository = tourDataRepository;
     private readonly ILocationRepository _locationRepository = locationRepository;
     private readonly IMapper _mapper = mapper;
+    private readonly EAWSRegionService _regionService = regionService;
+    private readonly EAWSReportService _reportService = reportService;
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -38,7 +42,6 @@ public class TourDataController(
     {
         var tourData = await _tourDataRepository.GetToursByActivityAsync(activity);
         // TODO: only include travel time and distance
-
         return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
     }
 
@@ -57,7 +60,7 @@ public class TourDataController(
     public async Task<ActionResult<TourDataDto>> GetTourData(int tourId,
         [FromKeyedServices("OSRM")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
     {
-        Location userLocation = new ();
+        Location userLocation = new();
         if (userLatitude is not null && userLongitude is not null)
         {
             userLocation.Latitude = (double)userLatitude;
@@ -67,7 +70,7 @@ public class TourDataController(
 
         if (tourData is null)
             return NotFound();
-        
+
         var tourDataDto = await GetTourData(tourData, travelService, userLocation);
 
         return Ok(tourDataDto);
@@ -79,7 +82,7 @@ public class TourDataController(
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetTourDataWithTraffic(int tourId,
         [FromKeyedServices("TomTom")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
     {
-        Location userLocation = new ();
+        Location userLocation = new();
         if (userLatitude is not null && userLongitude is not null)
         {
             userLocation.Latitude = (double)userLatitude;
@@ -103,6 +106,14 @@ public class TourDataController(
         {
             var travelInfo = await travelService.GetLongTravelInfoAsync(userLocation, targetLocation);
             tourDataDto.TravelDetails = travelInfo;
+
+            var regionID = _regionService.GetRegionID(targetLocation);
+            if (regionID != null)
+            {
+                var bulletin = await _reportService.GetLatestAvalancheReportAsync(regionID);
+                tourDataDto.Bulletin = _mapper.Map<AvalancheReportDto>(bulletin);
+                tourDataDto.Bulletin.RegionName = bulletin?.Regions.First(r => r.RegionID == regionID).Name;
+            }
         }
         return tourDataDto;
     }
@@ -117,7 +128,7 @@ public class TourDataController(
 
         if (!TryValidateModel(tourData))
             return BadRequest(ModelState);
-        
+
         await _tourDataRepository.AddTourAsync(tourData);
         await _tourDataRepository.SaveChangesAsync();
 
@@ -150,7 +161,7 @@ public class TourDataController(
 
         if (!TryValidateModel(tourToPatch))
             return BadRequest(ModelState);
-        
+
         _mapper.Map(tourToPatch, tour);
         await _tourDataRepository.SaveChangesAsync();
 

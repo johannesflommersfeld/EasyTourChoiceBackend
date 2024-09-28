@@ -13,9 +13,9 @@ public class AreaDto
 
     public int? Temperature { get; set; }
 
-    public WeatherForecastDto? WeatherForecast {get; set;}
+    public WeatherForecastDto? WeatherForecast { get; set; }
 
-    public AvelancheRisk? AvelancheRisk { get; set;}
+    public AvelancheRisk? AvelancheRisk { get; set; }
 
-    public AvalancheReportDto? AvalancheReport { get; set;}
+    public AvalancheReportDto? AvalancheReport { get; set; }
 }

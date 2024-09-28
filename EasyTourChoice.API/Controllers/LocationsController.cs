@@ -53,7 +53,7 @@ public class LocationController(
 
         if (!TryValidateModel(locationToPatch))
             return BadRequest(ModelState);
-        
+
         _mapper.Map(locationToPatch, location);
         await _locationRepository.SaveChangesAsync();
 

@@ -20,8 +20,8 @@ public class LocationAttributeTest
     public void SetValidLocation_CorrectValuesSet(double latitude, double longitude, double? altitude = null)
     {
         // arrange
-        var location = new Location() {Latitude = latitude, Longitude = longitude, Altitude = altitude};
-        
+        var location = new Location() { Latitude = latitude, Longitude = longitude, Altitude = altitude };
+
         // act, assert
         Assert.That(_locationAttribute.IsValid(location), Is.True);
         Assert.Multiple(() =>
@@ -54,7 +54,7 @@ public class LocationAttributeTest
     public void SetInvalidLocation_IsValidReturnsFalse(double latitude, double longitude, double? altitude = null)
     {
         // arrange
-        var location = new Location() {Latitude = latitude, Longitude = longitude, Altitude = altitude};
+        var location = new Location() { Latitude = latitude, Longitude = longitude, Altitude = altitude };
 
         // act, assert
         Assert.That(_locationAttribute.IsValid(location), Is.False);

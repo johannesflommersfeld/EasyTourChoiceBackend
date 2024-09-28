@@ -20,7 +20,7 @@ public class TourDataRepository(TourDataContext context) : ITourDataRepository
 
     public async Task<IEnumerable<TourData>> GetToursByAreaAsync(int areaId)
     {
-        return await _context.Tours.Where(t =>  t.AreaId == areaId).ToListAsync();
+        return await _context.Tours.Where(t => t.AreaId == areaId).ToListAsync();
     }
 
     public async Task<TourData?> GetTourByIdAsync(int id)
@@ -56,7 +56,7 @@ public class TourDataRepository(TourDataContext context) : ITourDataRepository
         if (tourData.Area != null)
         {
             var area = await _context.Areas.Where(a => a.Name == tourData.Area.Name).FirstOrDefaultAsync();
-            if(area != null)
+            if (area != null)
             {
                 tourData.AreaId = area.AreaId;
                 tourData.Area = null;
