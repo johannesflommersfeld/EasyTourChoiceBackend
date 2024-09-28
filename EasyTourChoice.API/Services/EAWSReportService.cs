@@ -1,20 +1,23 @@
 using Newtonsoft.Json;
 using EasyTourChoice.API.Entities;
+using EasyTourChoice.API.Models;
 using AutoMapper;
 
 namespace EasyTourChoice.API.Services;
 
 public class EAWSReportService(
     ILogger<EAWSReportService> logger,
-    IHttpService httpService
+    IHttpService httpService,
+    IMapper mapper
 ) : IHostedService
 {
     private Dictionary<string, EAWSBulletin>? _reports = null;
     private readonly ILogger _logger = logger;
     private readonly IHttpService _httpService = httpService;
+    private readonly IMapper _mapper = mapper;
     private readonly Task _completedTask = Task.CompletedTask;
 
-    public async Task<EAWSBulletin?> GetLatestAvalancheReportAsync(string regionID)
+    public async Task<AvalancheReportDto?> GetLatestAvalancheReportAsync(string regionID)
     {
         if (_reports is null || !_reports[regionID].IsValid())
         {
@@ -26,7 +29,9 @@ public class EAWSReportService(
             return null;
         }
 
-        return _reports?[regionID];
+        var report = _mapper.Map<AvalancheReportDto>(_reports?[regionID]);
+        report.RegionName = _reports?[regionID]?.Regions.First(r => r.RegionID == regionID).Name;
+        return report;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)

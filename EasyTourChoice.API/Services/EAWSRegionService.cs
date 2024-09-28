@@ -26,7 +26,6 @@ public class EAWSRegionService(
         return _completedTask;
     }
 
-    // TODO: should also be persisted in the database. Think of a reasonable approach to refresh this information.
     public string? GetRegionID(LocationBase location)
     {
         if (Regions is null)

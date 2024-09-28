@@ -15,7 +15,8 @@ public class TourDataController(
     ILogger<TourDataController> logger,
     IMapper mapper,
     EAWSRegionService regionService,
-    EAWSReportService reportService
+    EAWSReportService reportService,
+    IWeatherForecastService weatherForecastService
     ) : ControllerBase
 {
     private readonly ILogger<TourDataController> _logger = logger;
@@ -24,6 +25,7 @@ public class TourDataController(
     private readonly IMapper _mapper = mapper;
     private readonly EAWSRegionService _regionService = regionService;
     private readonly EAWSReportService _reportService = reportService;
+    private readonly IWeatherForecastService _weatherForecastService = weatherForecastService;
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -102,19 +104,22 @@ public class TourDataController(
     {
         var tourDataDto = _mapper.Map<TourDataDto>(tourData);
         var targetLocation = await _locationRepository.GetLocationAsync(tourDataDto.StartingLocationId);
-        if (userLocation != null && targetLocation != null)
+        if (targetLocation is null)
+            return tourDataDto;
+
+        if (userLocation is not null)
         {
             var travelInfo = await travelService.GetLongTravelInfoAsync(userLocation, targetLocation);
             tourDataDto.TravelDetails = travelInfo;
-
-            var regionID = _regionService.GetRegionID(targetLocation);
-            if (regionID != null)
-            {
-                var bulletin = await _reportService.GetLatestAvalancheReportAsync(regionID);
-                tourDataDto.Bulletin = _mapper.Map<AvalancheReportDto>(bulletin);
-                tourDataDto.Bulletin.RegionName = bulletin?.Regions.First(r => r.RegionID == regionID).Name;
-            }
         }
+
+        var regionID = _regionService.GetRegionID(targetLocation);
+        if (regionID is not null)
+        {
+            tourDataDto.Bulletin = await _reportService.GetLatestAvalancheReportAsync(regionID);
+        }
+
+        tourDataDto.WeatherForecast = await _weatherForecastService.GetWeatherForecastAsync(targetLocation);
         return tourDataDto;
     }
 

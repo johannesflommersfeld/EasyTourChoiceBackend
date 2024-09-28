@@ -12,6 +12,7 @@ builder.Services.AddHostedService<EAWSReportService>();
 builder.Services.AddScoped<ITourDataRepository, TourDataRepository>();
 builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<IWeatherForecastService, YRWeatherForecastService>();
 
 // TODO: replace key strings by enums
 builder.Services.AddKeyedScoped<ITravelPlanningService, TravelPlanningServiceOSRM>("OSRM");

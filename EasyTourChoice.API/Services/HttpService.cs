@@ -5,9 +5,13 @@ public class HttpService(ILogger<HttpService> logger, IHttpClientFactory httpCli
     private readonly ILogger _logger = logger;
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
-    public async Task<Stream> PerformGetRequestAsync(string url)
+    public async Task<Stream> PerformGetRequestAsync(string url, string? userAgent = null)
     {
         using HttpClient client = _httpClientFactory.CreateClient();
+        if (userAgent is not null)
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", userAgent);
+        }
         Stream? response = null;
         try
         {

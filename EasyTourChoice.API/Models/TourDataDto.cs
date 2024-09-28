@@ -11,4 +11,6 @@ public class TourDataDto : TourBase
     public TravelInformationDto? TravelDetails { get; set; }
 
     public AvalancheReportDto? Bulletin { get; set; }
+    
+    public WeatherForecastDto? WeatherForecast { get; set; }
 }

@@ -37,7 +37,7 @@ namespace EasyTourChoice.API.Entities
         required public List<Tendency> Tendency { get; set; }
 
         [JsonProperty("weatherForecast", Required = Required.Always)]
-        required public WeatherForecast WeatherForecast { get; set; }
+        required public EAWSWeatherForecast WeatherForecast { get; set; }
 
         [JsonProperty("regions", Required = Required.Always)]
         required public List<Region> Regions { get; set; }
@@ -126,7 +126,7 @@ namespace EasyTourChoice.API.Entities
     }
 
     // Highlight and comment for weather forecast information.
-    public record WeatherForecast
+    public record EAWSWeatherForecast
     {
         [JsonProperty("highlights", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         required public string Highlights { get; set; } = string.Empty;

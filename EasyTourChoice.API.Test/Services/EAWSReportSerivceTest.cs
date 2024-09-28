@@ -39,7 +39,7 @@ public class EAWSReportServiceTest
     public async Task LoadRegions_LoadedCorrectly()
     {
         // arrange
-        var reportService = new EAWSReportService(_loggerMock, _httpServiceMock);
+        var reportService = new EAWSReportService(_loggerMock, _httpServiceMock, _mapper);
 
         // act
         var bulletin = await reportService.GetLatestAvalancheReportAsync("IT-32-TN-11");
@@ -48,9 +48,7 @@ public class EAWSReportServiceTest
         Assert.That(bulletin, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(bulletin.Unscheduled, Is.False);
-            Assert.That(bulletin.Tendency, Has.Count.EqualTo(1));
-            Assert.That(bulletin.Tendency[0].TendencyType, Is.EqualTo(TendencyType.STEADY));
+            Assert.That(bulletin.Tendency, Is.EqualTo(TendencyType.STEADY));
             Assert.That(bulletin.AvalancheProblems, Has.Count.EqualTo(2));
             Assert.That(bulletin.AvalancheProblems[0].ProblemType, Is.EqualTo(AvalancheProblemType.WIND_SLAB));
             Assert.That(bulletin.AvalancheProblems[0].ProblemType, Is.EqualTo(AvalancheProblemType.WIND_SLAB));
@@ -61,7 +59,6 @@ public class EAWSReportServiceTest
             Assert.That(bulletin.DangerRatings[1].MainValue, Is.EqualTo(AvalancheDangerRating.MODERATE));
             Assert.That(bulletin.DangerRatings[1].Elevation.UpperBound, Is.Null);
             Assert.That(bulletin.DangerRatings[1].Elevation.LowerBound, Is.EqualTo("2600"));
-            Assert.That(bulletin.Language, Is.EqualTo("de"));
         });
     }
 }
