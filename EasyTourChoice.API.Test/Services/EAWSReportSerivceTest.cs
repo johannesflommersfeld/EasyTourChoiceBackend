@@ -24,6 +24,7 @@ public class EAWSReportServiceTest
         var mappingConfig = new MapperConfiguration(mc =>
         {
             mc.AddProfile(new AvalancheReportProfile());
+            mc.AddProfile(new AvalancheProblemProfile());
         });
         IMapper mapper = mappingConfig.CreateMapper();
         _mapper = mapper;
