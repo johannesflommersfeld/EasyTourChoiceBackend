@@ -1,65 +1,53 @@
 using Microsoft.AspNetCore.Mvc;
-using EasyTourChoice.API.Services;
-using EasyTourChoice.API.Models;
-using AutoMapper;
-using EasyTourChoice.API.Entities;
 using Microsoft.AspNetCore.JsonPatch;
+using AutoMapper;
+using EasyTourChoice.API.Controllers.Interfaces;
+using EasyTourChoice.API.Application.Models;
+using EasyTourChoice.API.Domain;
 
 namespace EasyTourChoice.API.Controllers;
 
 [ApiController]
 [Route("api/tourData")]
 public class TourDataController(
-    ITourDataRepository tourDataRepository,
-    ILocationRepository locationRepository,
     ILogger<TourDataController> logger,
     IMapper mapper,
-    EAWSRegionService regionService,
-    EAWSReportService reportService,
-    IWeatherForecastService weatherForecastService
+    ITourDataHandler tourDataHandler
     ) : ControllerBase
 {
     private readonly ILogger<TourDataController> _logger = logger;
-    private readonly ITourDataRepository _tourDataRepository = tourDataRepository;
-    private readonly ILocationRepository _locationRepository = locationRepository;
     private readonly IMapper _mapper = mapper;
-    private readonly EAWSRegionService _regionService = regionService;
-    private readonly EAWSReportService _reportService = reportService;
-    private readonly IWeatherForecastService _weatherForecastService = weatherForecastService;
+    private readonly ITourDataHandler _tourDataHandler = tourDataHandler;
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourData(
         [FromKeyedServices("OSRM")] ITravelPlanningService travelService)
     {
-        var tourData = await _tourDataRepository.GetAllToursAsync();
-        // TODO: only include travel time and distance
-
-        return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
+        var tours = await _tourDataHandler.GetAllToursAsync(travelService);
+        return Ok(tours);
     }
 
     [HttpGet("activities/{activity}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourDataByActivity(Activity activity)
     {
-        var tourData = await _tourDataRepository.GetToursByActivityAsync(activity);
-        // TODO: only include travel time and distance
-        return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
+        var tours = await _tourDataHandler.GetAllToursByActvityAsync(activity);
+        return Ok(tours);
     }
 
-    [HttpGet("areas/{areaId}")]
+    [HttpGet("areas/{areaID}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourDataByArea(int areaId)
+    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourDataByArea(int areaID)
     {
-        var tourData = await _tourDataRepository.GetToursByAreaAsync(areaId);
-
-        return Ok(_mapper.Map<IEnumerable<TourDataDto>>(tourData));
+        var tours = await _tourDataHandler.GetAllToursByAreaAsync(areaID);
+        return Ok(tours);
     }
 
-    [HttpGet("tours/{tourId}")]
+    [HttpGet("tours/{tourID}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TourDataDto>> GetTourData(int tourId,
+    public async Task<ActionResult<TourDataDto>> GetTourData(int tourID,
         [FromKeyedServices("OSRM")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
     {
         Location userLocation = new();
@@ -68,20 +56,18 @@ public class TourDataController(
             userLocation.Latitude = (double)userLatitude;
             userLocation.Longitude = (double)userLongitude;
         }
-        var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
+        var response = await _tourDataHandler.GetTourByIDAsync(tourID, userLocation, travelService);
 
-        if (tourData is null)
+        if (response.IsNotFound || response.TourData is null)
             return NotFound();
 
-        var tourDataDto = await GetTourData(tourData, travelService, userLocation);
-
-        return Ok(tourDataDto);
+        return Ok(response.TourData);
     }
 
-    [HttpGet("tours/{tourId}/traffic")]
+    [HttpGet("tours/{tourID}/traffic")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetTourDataWithTraffic(int tourId,
+    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetTourDataWithTraffic(int tourID,
         [FromKeyedServices("TomTom")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
     {
         Location userLocation = new();
@@ -90,52 +76,26 @@ public class TourDataController(
             userLocation.Latitude = (double)userLatitude;
             userLocation.Longitude = (double)userLongitude;
         }
-        var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
+        var response = await _tourDataHandler.GetTourByIDAsync(tourID, userLocation, travelService);
 
-        if (tourData is null)
+        if (response.IsNotFound || response.TourData is null)
             return NotFound();
 
-        var tourDataDto = await GetTourData(tourData, travelService, userLocation);
-
-        return Ok(tourDataDto);
-    }
-
-    private async Task<TourDataDto> GetTourData(TourData tourData, ITravelPlanningService travelService, Location? userLocation)
-    {
-        var tourDataDto = _mapper.Map<TourDataDto>(tourData);
-        var targetLocation = await _locationRepository.GetLocationAsync(tourDataDto.StartingLocationId);
-        if (targetLocation is null)
-            return tourDataDto;
-
-        if (userLocation is not null)
-        {
-            var travelInfo = await travelService.GetLongTravelInfoAsync(userLocation, targetLocation);
-            tourDataDto.TravelDetails = travelInfo;
-        }
-
-        var regionID = _regionService.GetRegionID(targetLocation);
-        if (regionID is not null)
-        {
-            tourDataDto.Bulletin = await _reportService.GetLatestAvalancheReportAsync(regionID);
-        }
-
-        tourDataDto.WeatherForecast = await _weatherForecastService.GetWeatherForecastAsync(targetLocation);
-        return tourDataDto;
+        return Ok(response.TourData);
     }
 
     [HttpPost]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<TourDataDto>> CreateTourDataWithoutTraffic(TourDataForCreationDto tour)
+    public async Task<ActionResult<TourDataDto>> CreateTourData(TourDataForCreationDto tour)
     {
         var tourData = _mapper.Map<TourData>(tour);
 
         if (!TryValidateModel(tourData))
             return BadRequest(ModelState);
 
-        await _tourDataRepository.AddTourAsync(tourData);
-        await _tourDataRepository.SaveChangesAsync();
+        await _tourDataHandler.CreateTourAsync(tourData);
 
         var tourDataForResponse = _mapper.Map<TourDataDto>(tourData);
 
@@ -144,17 +104,17 @@ public class TourDataController(
         return Created("GetTourData", tourDataForResponse);
     }
 
-    [HttpPatch("{tourId}")]
+    [HttpPatch("{tourID}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> UpdateTourData(int tourId,
+    public async Task<ActionResult> UpdateTourData(int tourID,
            JsonPatchDocument<TourDataForUpdateDto> patchDocument)
     {
-        if (!await _tourDataRepository.TourDataExistsAsync(tourId))
+        if (!await _tourDataHandler.TourExistsAsync(tourID))
             return NotFound();
 
-        var tour = await _tourDataRepository.GetTourByIdAsync(tourId);
+        var tour = await _tourDataHandler.GetPlainTourByIDAsync(tourID);
         if (tour == null)
             return NotFound();
 
@@ -164,14 +124,16 @@ public class TourDataController(
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        if (!TryValidateModel(tourToPatch))
-            return BadRequest(ModelState);
-
-        _mapper.Map(tourToPatch, tour);
-        await _tourDataRepository.SaveChangesAsync();
-
-        string msg = string.Format("Tour {0} was updated", tourId);
+        var result = await _tourDataHandler.UpdateTourAsync(tourID, tourToPatch);
+        string msg = string.Format("Tour {0} was updated", tourID);
         _logger.LogInformation("{msg}", msg);
+
+        if (result.IsBadRequest)
+            return BadRequest(result.ModelState);
+
+        if (result.IsNotFound)
+            return NotFound();
+
         return NoContent();
     }
 

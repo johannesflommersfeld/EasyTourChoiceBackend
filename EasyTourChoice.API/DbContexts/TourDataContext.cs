@@ -1,5 +1,5 @@
+using EasyTourChoice.API.Domain;
 using Microsoft.EntityFrameworkCore;
-using EasyTourChoice.API.Entities;
 
 namespace EasyTourChoice.API.DbContexts;
 

@@ -1,21 +1,19 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
-using EasyTourChoice.API.Services;
-using EasyTourChoice.API.Models;
-using AutoMapper;
+using EasyTourChoice.API.Controllers.Interfaces;
+using EasyTourChoice.API.Application.Models;
 
 namespace EasyTourChoice.API.Controllers;
 
 [ApiController]
 [Route("api/locations")]
 public class LocationController(
-    ILocationRepository locationRepository,
-    ILogger<TourDataController> logger,
+    ILocationHandler locationHandler,
     IMapper mapper
     ) : ControllerBase
 {
-    private readonly ILogger<TourDataController> _logger = logger;
-    private readonly ILocationRepository _locationRepository = locationRepository;
+    private readonly ILocationHandler _locationHandler = locationHandler;
     private readonly IMapper _mapper = mapper;
 
     [HttpGet("{locationId}")]
@@ -23,25 +21,25 @@ public class LocationController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<LocationDto>>> GetLocation(int locationId)
     {
-        var location = await _locationRepository.GetLocationAsync(locationId);
+        var location = await _locationHandler.GetLocationByIdAsync(locationId);
 
         if (location is null)
             return NotFound();
 
-        return Ok(_mapper.Map<LocationDto>(location));
+        return Ok(location);
     }
 
     [HttpPatch("{locationId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> UpdateLocation(int locationId,
+    public async Task<ActionResult> UpdateLocation(int locationID,
            JsonPatchDocument<LocationForUpdateDto> patchDocument)
     {
-        if (!await _locationRepository.LocationExistsAsync(locationId))
+        if (!await _locationHandler.LocationExistsAsync(locationID))
             return NotFound();
 
-        var location = await _locationRepository.GetLocationAsync(locationId);
+        var location = await _locationHandler.GetLocationByIdAsync(locationID);
         if (location == null)
             return NotFound();
 
@@ -51,14 +49,14 @@ public class LocationController(
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        if (!TryValidateModel(locationToPatch))
-            return BadRequest(ModelState);
+        var result = await _locationHandler.UpdateLocationAsync(locationID, locationToPatch);
 
-        _mapper.Map(locationToPatch, location);
-        await _locationRepository.SaveChangesAsync();
+        if (result.IsBadRequest)
+            return BadRequest(result.ModelState);
 
-        string msg = string.Format("Location {0} was updated", locationId);
-        _logger.LogInformation("{msg}", msg);
+        if (result.IsNotFound)
+            return NotFound();
+
         return NoContent();
     }
 }

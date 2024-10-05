@@ -1,21 +1,21 @@
-using Microsoft.AspNetCore.Mvc;
-using EasyTourChoice.API.Services;
-using EasyTourChoice.API.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
+using EasyTourChoice.API.Application.Models;
+using EasyTourChoice.API.Controllers.Interfaces;
 
 namespace EasyTourChoice.API.Controllers;
 
 [ApiController]
 [Route("api/areas")]
 public class AreaController(
-    IAreaRepository areaRepository,
     ILogger<AreaController> logger,
+    IAreaHandler areaHandler,
     IMapper mapper
     ) : ControllerBase
 {
     private readonly ILogger<AreaController> _logger = logger;
-    private readonly IAreaRepository _areaRepository = areaRepository;
+    private readonly IAreaHandler _areaHandler = areaHandler;
     private readonly IMapper _mapper = mapper;
 
     [HttpGet]
@@ -23,9 +23,7 @@ public class AreaController(
     public async Task<ActionResult<IEnumerable<AreaDto>>> GetAllAreas()
     {
         _logger.LogInformation("All tour data was requested");
-        var areaList = (await _areaRepository.GetAllAreasAsync()).ToList();
-
-        return Ok(_mapper.Map<IList<AreaDto>>(areaList));
+        return Ok(await _areaHandler.GetAllAreasAsync());
     }
 
     [HttpGet("{areaId}")]
@@ -34,14 +32,12 @@ public class AreaController(
     public async Task<ActionResult<IEnumerable<AreaDto>>> GetArea(int areaId)
     {
         _logger.LogInformation("Specific tour data was requested");
-        var area = await _areaRepository.GetAreaByIdAsync(areaId);
-
-        // include weather and avalanche information
+        var area = await _areaHandler.GetAreaByIdAsync(areaId);
 
         if (area is null)
             return NotFound();
 
-        return Ok(_mapper.Map<AreaDto>(area));
+        return Ok(area);
     }
 
     [HttpPatch("{areaId}")]
@@ -51,10 +47,10 @@ public class AreaController(
     public async Task<ActionResult> UpdateArea(int areaID,
            JsonPatchDocument<AreaForUpdateDto> patchDocument)
     {
-        if (!await _areaRepository.AreaExistsAsync(areaID))
+        if (!await _areaHandler.AreaExistsAsync(areaID))
             return NotFound();
 
-        var area = await _areaRepository.GetAreaByIdAsync(areaID);
+        var area = await _areaHandler.GetAreaByIdAsync(areaID);
         if (area == null)
             return NotFound();
 
@@ -64,14 +60,14 @@ public class AreaController(
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        if (!TryValidateModel(areaToPatch))
-            return BadRequest(ModelState);
+        var result = await _areaHandler.UpdateAreaAsync(areaID, areaToPatch);
 
-        _mapper.Map(areaToPatch, area);
-        await _areaRepository.SaveChangesAsync();
+        if (result.IsBadRequest)
+            return BadRequest(result.ModelState);
 
-        string msg = string.Format("Area {0} was updated", areaID);
-        _logger.LogInformation("{msg}", msg);
+        if (result.IsNotFound)
+            return NotFound();
+
         return NoContent();
     }
 }
