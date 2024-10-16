@@ -12,7 +12,7 @@ public class HttpService(ILogger<HttpService> logger, IHttpClientFactory httpCli
         using HttpClient client = _httpClientFactory.CreateClient();
         if (userAgent is not null)
         {
-            client.DefaultRequestHeaders.Add("User-Agent", userAgent);
+            client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", userAgent);
         }
         Stream? response = null;
         try

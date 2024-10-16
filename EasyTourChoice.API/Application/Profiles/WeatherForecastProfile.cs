@@ -24,6 +24,13 @@ public class WeatherForecastProfile : Profile
             .AfterMap((src, dest, context) => context.Mapper.Map(src.Forecast, dest));
         CreateMap<YRForecast, WeatherForecast>();
 
+        CreateMap<Meta, MetaDto>();
+        CreateMap<ForecastUnits, ForecastUnitsDto>();
+        CreateMap<ForecastTimeStep, ForecastTimeStepDto>();
+        CreateMap<ForecastData, ForecastDataDto>();
+        CreateMap<ForecastTimeInstant, ForecastTimeInstantDto>();
+        CreateMap<ForecastTimePeriod, ForecastTimePeriodDto>();
+        CreateMap<ForecastTimePeriodDetails, ForecastTimePeriodDetailsDto>();
         CreateMap<WeatherForecast, WeatherForecastDto>();
     }
 }

@@ -25,6 +25,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 ShortDescription = "Non existing ski tour for testing.",
                 Risk = RiskLevel.MODERATE_RISK,
                 AreaId = 1,
+                AvalancheRegionID = null
             },
             new TourData()
             {
@@ -38,6 +39,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 ShortDescription = "Another non existing ski tour for testing.",
                 Risk = RiskLevel.HIGH_RISK,
                 AreaId = 2,
+                AvalancheRegionID = null
             }
         );
 

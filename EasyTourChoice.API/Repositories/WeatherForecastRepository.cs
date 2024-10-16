@@ -13,7 +13,8 @@ public class WeatherForecastRepository : IWeatherForecastRepository
 
     public WeatherForecast? GetReportByLocation(Location location)
     {
-        return _forecasts[location];
+        _forecasts.TryGetValue(location, out WeatherForecast? forecast);
+        return forecast;
     }
 
     public void SaveForecast(Location location, WeatherForecast forecast)
