@@ -1,12 +1,14 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using AutoMapper;
-using EasyTourChoice.API.Services;
-using EasyTourChoice.API.Entities;
-using EasyTourChoice.API.Profiles;
-using EasyTourChoice.API.Models;
+using EasyTourChoice.API.Application.DataAggregation;
+using EasyTourChoice.API.Application.Profiles;
+using EasyTourChoice.API.Application.Models;
+using EasyTourChoice.API.Controllers.Interfaces;
+using EasyTourChoice.API.Domain;
+using EasyTourChoice.API.Repositories;
 
-namespace EasyTourChoice.API.Test.Services;
+namespace EasyTourChoice.API.Test.Application.DataAggregation;
 
 public class YRWeatherForecastServiceTest
 {
@@ -14,6 +16,7 @@ public class YRWeatherForecastServiceTest
     private IHttpService _httpServiceMock;
     private FileStream _regionsStream;
     private IMapper _mapper;
+    private WeatherForecastRepository _forecastRepo;
 
     [SetUp]
     public void SetUp()
@@ -28,6 +31,7 @@ public class YRWeatherForecastServiceTest
         });
         IMapper mapper = mappingConfig.CreateMapper();
         _mapper = mapper;
+        _forecastRepo = new WeatherForecastRepository();
     }
 
     [TearDown]
@@ -40,7 +44,7 @@ public class YRWeatherForecastServiceTest
     public async Task LoadWeatherForecast_LoadedCorrectly()
     {
         // arrange
-        var forecastService = new YRWeatherForecastService(_loggerMock, _httpServiceMock, _mapper);
+        var forecastService = new YRWeatherForecastService(_loggerMock, _httpServiceMock, _mapper, _forecastRepo);
 
         // act
         var forecast = await forecastService.GetWeatherForecastAsync(new Location());
@@ -63,7 +67,7 @@ public class YRWeatherForecastServiceTest
             Assert.That(forecast.Timeseries[0].Data.Instant.WindSpeed,
                 Is.EqualTo(3.3).Within(Tolerances.DOUBLE_EPS));
             Assert.That(forecast.Timeseries[0].Data.NextOneHours.SymbolCode,
-                Is.EqualTo(WeatherSymbol.PARTLY_CLOUDY_NIGHT));
+                Is.EqualTo(WeatherSymbolDto.PARTLY_CLOUDY_NIGHT));
             Assert.That(forecast.Timeseries[0].Data.NextOneHours.Details, Is.Not.Null);
         });
         Assert.Multiple(() =>

@@ -1,7 +1,7 @@
-using EasyTourChoice.API.Entities;
-using EasyTourChoice.API.ValidationAttributes;
+using EasyTourChoice.API.Domain;
+using EasyTourChoice.API.Domain.ValidationAttributes;
 
-namespace EasyTourChoice.API.Test.ValidationAttributes;
+namespace EasyTourChoice.API.Test.Domain.ValidationAttributes;
 
 public class LocationAttributeTest
 {

@@ -1,18 +1,22 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using EasyTourChoice.API.Services;
 using AutoMapper;
-using EasyTourChoice.API.Profiles;
-using EasyTourChoice.API.Entities;
+using EasyTourChoice.API.Application.DataAggregation;
+using EasyTourChoice.API.Controllers.Interfaces;
+using EasyTourChoice.API.Application.Profiles;
+using EasyTourChoice.API.Application.Models;
+using EasyTourChoice.API.Repositories.Interfaces;
+using EasyTourChoice.API.Repositories;
 
-namespace EasyTourChoice.API.Test.Services;
+namespace EasyTourChoice.API.Test.Application.DataAggregation;
 
 public class EAWSReportServiceTest
 {
     private ILogger<EAWSReportService> _loggerMock;
     private IHttpService _httpServiceMock;
-    private FileStream _reportStream;
+    private FileStream _reportStream; 
     private IMapper _mapper;
+    private IAvalancheReportsRepository _avalancheReportsRepository;
 
     [SetUp]
     public void SetUp()
@@ -28,6 +32,7 @@ public class EAWSReportServiceTest
         });
         IMapper mapper = mappingConfig.CreateMapper();
         _mapper = mapper;
+        _avalancheReportsRepository = new AvalancheReportsRepository();
     }
 
     [TearDown]
@@ -37,13 +42,26 @@ public class EAWSReportServiceTest
     }
 
     [Test]
-    public async Task LoadRegions_LoadedCorrectly()
+    public async Task GetReport_MustBeValid_ReturnsNull()
     {
         // arrange
-        var reportService = new EAWSReportService(_loggerMock, _httpServiceMock, _mapper);
+        var reportService = new EAWSReportService(_loggerMock, _httpServiceMock, _mapper, _avalancheReportsRepository);
 
         // act
-        var bulletin = await reportService.GetLatestAvalancheReportAsync("IT-32-TN-11");
+        var bulletin = await reportService.GetAvalancheReportAsync("IT-32-TN-11", true);
+
+        // assert
+        Assert.That(bulletin, Is.Null);
+    }
+
+    [Test]
+    public async Task GetReport_IgnoreValidity_LoadedCorrectly()
+    {
+        // arrange
+        var reportService = new EAWSReportService(_loggerMock, _httpServiceMock, _mapper, _avalancheReportsRepository);
+
+        // act
+        var bulletin = await reportService.GetAvalancheReportAsync("IT-32-TN-11", false);
 
         // assert
         Assert.That(bulletin, Is.Not.Null);
@@ -55,11 +73,11 @@ public class EAWSReportServiceTest
             Assert.That(bulletin.AvalancheProblems[0].ProblemType, Is.EqualTo(AvalancheProblemType.WIND_SLAB));
             Assert.That(bulletin.DangerRatings, Has.Count.EqualTo(2));
             Assert.That(bulletin.DangerRatings[0].MainValue, Is.EqualTo(AvalancheDangerRating.LOW));
-            Assert.That(bulletin.DangerRatings[0].Elevation.UpperBound, Is.EqualTo("2600"));
-            Assert.That(bulletin.DangerRatings[0].Elevation.LowerBound, Is.Null);
+            Assert.That(bulletin.DangerRatings[0].UpperBound, Is.EqualTo("2600"));
+            Assert.That(bulletin.DangerRatings[0].LowerBound, Is.Null);
             Assert.That(bulletin.DangerRatings[1].MainValue, Is.EqualTo(AvalancheDangerRating.MODERATE));
-            Assert.That(bulletin.DangerRatings[1].Elevation.UpperBound, Is.Null);
-            Assert.That(bulletin.DangerRatings[1].Elevation.LowerBound, Is.EqualTo("2600"));
+            Assert.That(bulletin.DangerRatings[1].UpperBound, Is.Null);
+            Assert.That(bulletin.DangerRatings[1].LowerBound, Is.EqualTo("2600"));
         });
     }
 }

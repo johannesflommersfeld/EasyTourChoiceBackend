@@ -4,5 +4,9 @@ namespace EasyTourChoice.API.Controllers.Interfaces;
 
 public interface IAvalancheReportService
 {
-    Task<AvalancheReportDto?> GetValidAvalancheReportAsync(string regionID);
+#if DEBUG
+    Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID, bool mustBeValid=true);
+#else
+    Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID);
+#endif
 }

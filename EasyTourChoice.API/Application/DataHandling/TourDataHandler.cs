@@ -80,7 +80,7 @@ public class TourDataHandler(
         var regionID = tourDataDto.AvalancheRegionID is not null ? tourDataDto.AvalancheRegionID : await _regionService.GetRegionIDAsync(targetLocation);
         if (regionID is not null)
         {
-            tourDataDto.Bulletin = await _reportService.GetValidAvalancheReportAsync(regionID);
+            tourDataDto.Bulletin = await _reportService.GetAvalancheReportAsync(regionID);
         }
 
         tourDataDto.WeatherForecast = await _weatherForecastService.GetWeatherForecastAsync(targetLocation);

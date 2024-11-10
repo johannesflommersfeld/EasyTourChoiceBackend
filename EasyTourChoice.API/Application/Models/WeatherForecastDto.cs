@@ -87,7 +87,7 @@ public record ForecastTimePeriodDto
 {
     required public ForecastTimePeriodDetailsDto? Details { get; set; }
 
-    required public WeatherSymbol? SymbolCode { get; set; }
+    required public WeatherSymbolDto? SymbolCode { get; set; }
 }
 
 // TODO: remove everything that is not needed in the frontend
@@ -110,7 +110,7 @@ public record ForecastTimePeriodDetailsDto
     public double? UVIndexClearSkyMax { get; set; }
 }
 
-public enum WeatherSymbol
+public enum WeatherSymbolDto
 {
     CLEARSKY_DAY,
     CLEARSKY_NIGHT,

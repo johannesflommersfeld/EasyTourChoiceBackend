@@ -11,5 +11,83 @@ public class AvalancheReportProfile : Profile
         CreateMap<AvalancheProblem, AvalancheProblemDto>();
         CreateMap<DangerRating, DangerRatingDto>();
         CreateMap<AvalancheReport, AvalancheReportDto>();
+
+        CreateMap<EAWSBulletin, AvalancheReport>()
+            .ForMember(dest => dest.ReportBody, opt => opt.MapFrom<ReportBodyResolver>())
+            .ForMember(dest => dest.Tendency, opt => opt.MapFrom<TendencyTypeResolver>());
+        CreateMap<EAWSAvalancheProblem, AvalancheProblem>()
+            .ForMember(dest => dest.UpperBound, opt => opt.MapFrom<AvalancheProblemUpperBoundResolver>())
+            .ForMember(dest => dest.LowerBound, opt => opt.MapFrom<AvalancheProblemLowerBoundResolver>());
+        CreateMap<EAWSDangerRating, DangerRating>()
+            .ForMember(dest => dest.UpperBound, opt => opt.MapFrom<DangerRatingUpperBoundResolver>())
+            .ForMember(dest => dest.LowerBound, opt => opt.MapFrom<DangerRatingLowerBoundResolver>());
+    }
+}
+
+public class ReportBodyResolver : IValueResolver<EAWSBulletin, AvalancheReport, Dictionary<string, List<string>>>
+{
+    public Dictionary<string, List<string>> Resolve(EAWSBulletin source, AvalancheReport destination,
+        Dictionary<string, List<string>> member, ResolutionContext context)
+    {
+        Dictionary<string, List<string>> body = [];
+        body["Avalanche activity"] = [source.AvalancheActivity.Highlights, source.AvalancheActivity.Comment];
+        body["Snowpack structure"] = [source.SnowpackStructure.Highlights, source.SnowpackStructure.Comment];
+        List<string> tendencies = [];
+        foreach (var tendency in source.Tendency)
+        {
+            if (tendency.Highlights != string.Empty)
+            {
+                tendencies.Add(tendency.Highlights);
+            }
+            if (tendency.Highlights != string.Empty)
+            {
+                tendencies.Add(tendency.Comment);
+            }
+        }
+        body["TendencyText"] = tendencies;
+        body["Travel advisory"] = [source.TravelAdvisory.Highlights, source.TravelAdvisory.Comment];
+        return body;
+    }
+}
+
+public class TendencyTypeResolver : IValueResolver<EAWSBulletin, AvalancheReport, TendencyType>
+{
+    public TendencyType Resolve(EAWSBulletin source, AvalancheReport destination,
+        TendencyType member, ResolutionContext context)
+    {
+        var types = source.Tendency.Select(t => t.TendencyType).ToList();
+        return types.Any(t => t != types[0]) ? TendencyType.UNKNOWN : types[0];
+    }
+}
+
+public class AvalancheProblemUpperBoundResolver : IValueResolver<EAWSAvalancheProblem, AvalancheProblem, string?>
+{
+    public string? Resolve(EAWSAvalancheProblem source, AvalancheProblem destination, string? member, ResolutionContext context)
+    {
+        return source.Elevation.UpperBound;
+    }
+}
+
+public class AvalancheProblemLowerBoundResolver : IValueResolver<EAWSAvalancheProblem, AvalancheProblem, string?>
+{
+    public string? Resolve(EAWSAvalancheProblem source, AvalancheProblem destination, string? member, ResolutionContext context)
+    {
+        return source.Elevation.LowerBound;
+    }
+}
+
+public class DangerRatingUpperBoundResolver : IValueResolver<EAWSDangerRating, DangerRating, string?>
+{
+    public string? Resolve(EAWSDangerRating source, DangerRating destination, string? member, ResolutionContext context)
+    {
+        return source.Elevation.UpperBound;
+    }
+}
+
+public class DangerRatingLowerBoundResolver : IValueResolver<EAWSDangerRating, DangerRating, string?>
+{
+    public string? Resolve(EAWSDangerRating source, DangerRating destination, string? member, ResolutionContext context)
+    {
+        return source.Elevation.LowerBound;
     }
 }

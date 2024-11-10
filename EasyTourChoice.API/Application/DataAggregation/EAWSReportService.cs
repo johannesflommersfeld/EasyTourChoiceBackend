@@ -19,7 +19,11 @@ public class EAWSReportService(
     private readonly IMapper _mapper = mapper;
     private readonly IAvalancheReportsRepository _reportsRepository = avalancheReportsRepository;
 
-    public async Task<AvalancheReportDto?> GetValidAvalancheReportAsync(string regionID)
+#if DEBUG
+    public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID, bool mustBeValid=true)
+#else
+    public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID)
+#endif
     {
         var report = _reportsRepository.GetReportByRegionID(regionID);
         if (report is null || !report.IsValid())
@@ -28,7 +32,10 @@ public class EAWSReportService(
             report = _reportsRepository.GetReportByRegionID(regionID);
         }
 
-        if (report is null || !report.IsValid())
+        if (report is null)
+            return null;
+
+        if (mustBeValid && !report.IsValid())
             return null;
 
         return _mapper.Map<AvalancheReportDto>(report);

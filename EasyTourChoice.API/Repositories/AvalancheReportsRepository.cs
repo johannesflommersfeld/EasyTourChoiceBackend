@@ -13,11 +13,12 @@ public class AvalancheReportsRepository : IAvalancheReportsRepository
 
     public AvalancheReport? GetReportByRegionID(string id)
     {
-        return _reports[id];
+        _reports.TryGetValue(id, out AvalancheReport? report);
+        return report;
     }
 
-    public void SaveReport(string ID, AvalancheReport report)
+    public void SaveReport(string id, AvalancheReport report)
     {
-        _reports[ID] = report;
+        _reports[id] = report;
     }
 }
