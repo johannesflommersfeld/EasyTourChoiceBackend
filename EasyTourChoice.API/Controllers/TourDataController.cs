@@ -50,12 +50,16 @@ public class TourDataController(
     public async Task<ActionResult<TourDataDto>> GetTourData(int tourID,
         [FromKeyedServices("OSRM")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
     {
-        Location userLocation = new();
+        Location? userLocation = null;
         if (userLatitude is not null && userLongitude is not null)
         {
-            userLocation.Latitude = (double)userLatitude;
-            userLocation.Longitude = (double)userLongitude;
+            userLocation = new Location()
+            {
+                Latitude = (double)userLatitude,
+                Longitude = (double)userLongitude,
+            };
         }
+
         var response = await _tourDataHandler.GetTourByIDAsync(tourID, userLocation, travelService);
 
         if (response.IsNotFound || response.TourData is null)

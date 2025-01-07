@@ -52,7 +52,7 @@ public class TourDataHandler(
         return _mapper.Map<TourDataDto>(tourData);
     }
 
-    public async Task<TourDataResult> GetTourByIDAsync(int tourID, Location userLocation, ITravelPlanningService travelService)
+    public async Task<TourDataResult> GetTourByIDAsync(int tourID, Location? userLocation, ITravelPlanningService travelService)
     {
         var result = new TourDataResult();
         var tourData = await _tourDataRepository.GetTourByIdAsync(tourID);

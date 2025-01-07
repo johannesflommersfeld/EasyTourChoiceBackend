@@ -77,7 +77,7 @@ public class YRWeatherForecastService(
         return new Location()
         {
             Longitude = Math.Round(location.Longitude, 1),
-            Latitude = Math.Round(location.Longitude, 1),
+            Latitude = Math.Round(location.Latitude, 1),
             Altitude = location.Altitude is null ? null : Math.Round((double)location.Altitude, 1),
         };
     }

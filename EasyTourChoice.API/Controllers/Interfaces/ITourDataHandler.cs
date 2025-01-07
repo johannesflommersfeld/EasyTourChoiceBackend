@@ -9,7 +9,7 @@ public interface ITourDataHandler
     Task CreateTourAsync(TourData tour);
     Task<TourDataResult> UpdateTourAsync(int tourID, TourDataForUpdateDto tourToPatch);
     Task<TourDataDto?> GetPlainTourByIDAsync(int tourID);
-    Task<TourDataResult> GetTourByIDAsync(int tourID, Location userLocation, ITravelPlanningService travelService);
+    Task<TourDataResult> GetTourByIDAsync(int tourID, Location? userLocation, ITravelPlanningService travelService);
     Task<bool> TourExistsAsync(int tourID);
     // TODO: allow for filtering and sorting
     Task<List<TourDataDto>> GetAllToursAsync(ITravelPlanningService travelService);
