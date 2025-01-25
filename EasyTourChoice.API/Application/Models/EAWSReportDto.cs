@@ -242,8 +242,8 @@ public record EAWSDangerRating
     [JsonProperty("mainValue", Required = Required.Always)]
     required public AvalancheDangerRating MainValue { get; set; }
 
-    [JsonProperty("elevation", Required = Required.Always)]
-    required public EAWSElevation Elevation { get; set; }
+    [JsonProperty("elevation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+    public EAWSElevation? Elevation { get; set; }
 
     [JsonProperty("validTimePeriod", Required = Required.Always)]
     required public ValidTimePeriod ValidTimePeriod { get; set; }

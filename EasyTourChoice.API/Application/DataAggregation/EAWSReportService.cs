@@ -20,7 +20,7 @@ public class EAWSReportService(
     private readonly IAvalancheReportsRepository _reportsRepository = avalancheReportsRepository;
 
 #if DEBUG
-    public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID, bool mustBeValid=true)
+    public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID, bool mustBeValid = true)
 #else
     public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID)
 #endif
@@ -72,6 +72,8 @@ public class EAWSReportService(
     private string GetURL(string language)
     {
         // TODO: move to configuration file
-        return $"https://static.avalanche.report/bulletins/latest/{language}_CAAMLv6.json";
+        // Taken from https://avalanche.report/more/open-data
+        //TODO: also get reports from: https://static.avalanche.report/eaws_bulletins/YYYY-MM-DD/...
+        return $"https://static.avalanche.report/bulletins/latest/EUREGIO_{language}_CAAMLv6.json";
     }
 }

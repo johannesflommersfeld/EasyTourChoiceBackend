@@ -3,18 +3,32 @@ using EasyTourChoice.API.Controllers.Interfaces;
 using EasyTourChoice.API.Application.Models.BaseModels;
 using EasyTourChoice.API.Application.Models;
 using EasyTourChoice.API.Repositories.Interfaces;
+using YamlDotNet.Serialization;
 
 namespace EasyTourChoice.API.Domain;
 
-public class EAWSRegionService(
-    ILogger<EAWSRegionService> logger,
-    IHttpService httpService,
-    IAvalancheRegionsRepository avalancheRegionsRepository
-) : IAvalancheRegionService
+public class EAWSRegionService : IAvalancheRegionService
 {
-    private readonly ILogger _logger = logger;
-    private readonly IHttpService _httpService = httpService;
-    private readonly IAvalancheRegionsRepository _avalancheRegionsRepository = avalancheRegionsRepository;
+    private readonly ILogger _logger;
+    private readonly IHttpService _httpService;
+    private readonly IAvalancheRegionsRepository _avalancheRegionsRepository;
+    private readonly Dictionary<string, string> _regionNames;
+
+    public EAWSRegionService(
+        ILogger<EAWSRegionService> logger,
+        IHttpService httpService,
+        IAvalancheRegionsRepository avalancheRegionsRepository
+    )
+    {
+        _logger = logger;
+        _httpService = httpService;
+        _avalancheRegionsRepository = avalancheRegionsRepository;
+
+        // TODO: include proper resource handling
+        string yamlContent = File.ReadAllText("Resources/regions.yaml");
+        var deserializer = new DeserializerBuilder().Build();
+        _regionNames = deserializer.Deserialize<Dictionary<string, string>>(yamlContent);
+    }
 
     public async Task<string?> GetRegionIDAsync(LocationBase location)
     {
@@ -68,6 +82,11 @@ public class EAWSRegionService(
         }
     }
 
+    public string GetRegionName(string id)
+    {
+        return _regionNames[id];
+    }
+
     private static bool IsInPolygon(LocationBase location, List<LocationBase> polygon)
     {
         // Implements winding number algorithm.
@@ -97,7 +116,7 @@ public class EAWSRegionService(
                 - (location.Longitude - p1.Longitude) * (p2.Latitude - p1.Latitude);
             windingNumber += EdgeFunctionValue > 0 ? 1 : -1;
         }
-        return windingNumber % 2 == 1;
+        return Math.Abs(windingNumber) % 2 == 1;
     }
 
     private string GetURL()

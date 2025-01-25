@@ -25,7 +25,7 @@ public record AvalancheReport
 
     public bool IsValid()
     {
-        return (StartTime > DateTime.Now) && (EndTime < DateTime.Now);
+        return (StartTime < DateTime.Now) && (EndTime > DateTime.Now);
     }
 }
 

@@ -1,5 +1,4 @@
 using AutoMapper;
-using EasyTourChoice.API.Application.DataAggregation;
 using EasyTourChoice.API.Application.Models;
 using EasyTourChoice.API.Controllers.Interfaces;
 using EasyTourChoice.API.Domain;
@@ -52,7 +51,7 @@ public class TourDataHandler(
         return _mapper.Map<TourDataDto>(tourData);
     }
 
-    public async Task<TourDataResult> GetTourByIDAsync(int tourID, Location? userLocation, ITravelPlanningService travelService)
+    public async Task<TourDataResult> GetTourByIDAsync(int tourID)
     {
         var result = new TourDataResult();
         var tourData = await _tourDataRepository.GetTourByIdAsync(tourID);
@@ -63,30 +62,89 @@ public class TourDataHandler(
             return result;
         }
 
-        var tourDataDto = _mapper.Map<TourDataDto>(tourData);
-        var targetLocation = await _locationRepository.GetLocationAsync(tourDataDto.StartingLocationId);
-        if (targetLocation is null)
+        result.TourData = _mapper.Map<TourDataDto>(tourData);
+        result.IsSuccess = true;
+
+        return result;
+    }
+
+    public async Task<WeatherForecastResult> GetWeatherForecast(int tourID)
+    {
+        var result = new WeatherForecastResult();
+        var tourData = await _tourDataRepository.GetTourByIdAsync(tourID);
+        if (tourData is null)
         {
-            result.TourData = tourDataDto;
+            result.IsNotFound = true;
             return result;
         }
 
-        if (userLocation is not null)
+        var targetLocation = await _locationRepository.GetLocationAsync(tourData.StartingLocationId);
+        if (targetLocation is null)
         {
-            var travelInfo = await travelService.GetLongTravelInfoAsync(userLocation, targetLocation);
-            tourDataDto.TravelDetails = travelInfo;
+            result.IsNotFound = true;
+            return result;
         }
 
-        var regionID = tourDataDto.AvalancheRegionID is not null ? tourDataDto.AvalancheRegionID : await _regionService.GetRegionIDAsync(targetLocation);
-        if (regionID is not null)
-        {
-            tourDataDto.Bulletin = await _reportService.GetAvalancheReportAsync(regionID);
-        }
+        result.WeatherForecast = await _weatherForecastService.GetWeatherForecastAsync(targetLocation);
 
-        tourDataDto.WeatherForecast = await _weatherForecastService.GetWeatherForecastAsync(targetLocation);
-        result.TourData = tourDataDto;
         result.IsSuccess = true;
+        return result;
+    }
 
+    public async Task<TravelInfoResult> GetTravelInfoAsync(int tourID, Location userLocation, ITravelPlanningService travelService)
+    {
+        var result = new TravelInfoResult();
+        var tourData = await _tourDataRepository.GetTourByIdAsync(tourID);
+        if (tourData is null)
+        {
+            result.IsNotFound = true;
+            return result;
+        }
+
+        var targetLocation = await _locationRepository.GetLocationAsync(tourData.StartingLocationId);
+        if (targetLocation is null)
+        {
+            result.IsNotFound = true;
+            return result;
+        }
+
+        result.TravelInformation = await travelService.GetLongTravelInfoAsync(userLocation, targetLocation);
+        result.IsSuccess = true;
+        return result;
+    }
+
+    public async Task<BulletinResult> GetBulletinAsync(int tourID)
+    {
+        var result = new BulletinResult();
+        var tourData = await _tourDataRepository.GetTourByIdAsync(tourID);
+        if (tourData is null)
+        {
+            result.IsNotFound = true;
+            return result;
+        }
+
+        var targetLocation = await _locationRepository.GetLocationAsync(tourData.StartingLocationId);
+        if (targetLocation is null)
+        {
+            result.IsNotFound = true;
+            return result;
+        }
+
+        var regionID = tourData.AvalancheRegionID ?? await _regionService.GetRegionIDAsync(targetLocation);
+        if (regionID is null)
+        {
+            result.IsNotFound = true;
+            return result;
+        }
+        var bulletin = await _reportService.GetAvalancheReportAsync(regionID);
+        if (bulletin is null)
+        {
+            result.IsNotFound = true;
+            return result;
+        }
+        bulletin.RegionName = _regionService.GetRegionName(regionID);
+        result.Bulletin = bulletin;
+        result.IsSuccess = true;
         return result;
     }
 

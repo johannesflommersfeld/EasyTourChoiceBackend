@@ -47,20 +47,9 @@ public class TourDataController(
     [HttpGet("tours/{tourID}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TourDataDto>> GetTourData(int tourID,
-        [FromKeyedServices("OSRM")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
+    public async Task<ActionResult<TourDataDto>> GetTourData(int tourID)
     {
-        Location? userLocation = null;
-        if (userLatitude is not null && userLongitude is not null)
-        {
-            userLocation = new Location()
-            {
-                Latitude = (double)userLatitude,
-                Longitude = (double)userLongitude,
-            };
-        }
-
-        var response = await _tourDataHandler.GetTourByIDAsync(tourID, userLocation, travelService);
+        var response = await _tourDataHandler.GetTourByIDAsync(tourID);
 
         if (response.IsNotFound || response.TourData is null)
             return NotFound();
@@ -68,10 +57,58 @@ public class TourDataController(
         return Ok(response.TourData);
     }
 
-    [HttpGet("tours/{tourID}/traffic")]
+    [HttpGet("tours/{tourID}/weatherForecast")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<TourDataDto>>> GetTourDataWithTraffic(int tourID,
+    public async Task<ActionResult<WeatherForecastDto>> GetTravelInfo(int tourID)
+    {
+
+        var response = await _tourDataHandler.GetWeatherForecast(tourID);
+
+        if (response.IsNotFound || response.WeatherForecast is null)
+            return NotFound();
+
+        return Ok(response.WeatherForecast);
+    }
+
+    [HttpGet("tours/{tourID}/avalancheReport")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<WeatherForecastDto>> GetAvalancheReport(int tourID)
+    {
+
+        var response = await _tourDataHandler.GetBulletinAsync(tourID);
+
+        if (response.IsNotFound || response.Bulletin is null)
+            return NotFound();
+
+        return Ok(response.Bulletin);
+    }
+
+    [HttpGet("tours/{tourID}/travelInfo")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TravelInformationDto>> GetTravelInfo(int tourID,
+        [FromKeyedServices("OSRM")] ITravelPlanningService travelService, double userLatitude, double userLongitude)
+    {
+        var userLocation = new Location()
+        {
+            Latitude = (double)userLatitude,
+            Longitude = (double)userLongitude,
+        };
+
+        var response = await _tourDataHandler.GetTravelInfoAsync(tourID, userLocation, travelService);
+
+        if (response.IsNotFound || response.TravelInformation is null)
+            return NotFound();
+
+        return Ok(response.TravelInformation);
+    }
+
+    [HttpGet("tours/{tourID}/travelInfo/traffic")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<TravelInformationDto>>> GetTourDataWithTraffic(int tourID,
         [FromKeyedServices("TomTom")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
     {
         Location userLocation = new();
@@ -80,12 +117,12 @@ public class TourDataController(
             userLocation.Latitude = (double)userLatitude;
             userLocation.Longitude = (double)userLongitude;
         }
-        var response = await _tourDataHandler.GetTourByIDAsync(tourID, userLocation, travelService);
+        var response = await _tourDataHandler.GetTravelInfoAsync(tourID, userLocation, travelService);
 
-        if (response.IsNotFound || response.TourData is null)
+        if (response.IsNotFound || response.TravelInformation is null)
             return NotFound();
 
-        return Ok(response.TourData);
+        return Ok(response.TravelInformation);
     }
 
     [HttpPost]
