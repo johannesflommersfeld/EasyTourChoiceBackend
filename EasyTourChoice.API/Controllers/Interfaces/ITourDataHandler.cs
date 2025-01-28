@@ -45,7 +45,7 @@ public record TravelInfoResult
     public bool IsNotFound { get; set; }
     public bool IsBadRequest { get; set; }
     public ModelStateDictionary ModelState { get; set; } = [];
-    public TravelInformationDto? TravelInformation { get; set; }
+    public TravelInformationWithRouteDto? TravelInformation { get; set; }
 }
 
 public record BulletinResult

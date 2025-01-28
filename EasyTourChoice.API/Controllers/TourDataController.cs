@@ -4,6 +4,7 @@ using AutoMapper;
 using EasyTourChoice.API.Controllers.Interfaces;
 using EasyTourChoice.API.Application.Models;
 using EasyTourChoice.API.Domain;
+using EasyTourChoice.API.Repositories.Interfaces;
 
 namespace EasyTourChoice.API.Controllers;
 
@@ -12,12 +13,14 @@ namespace EasyTourChoice.API.Controllers;
 public class TourDataController(
     ILogger<TourDataController> logger,
     IMapper mapper,
-    ITourDataHandler tourDataHandler
+    ITourDataHandler tourDataHandler,
+    ILocationHandler locationHandler
     ) : ControllerBase
 {
     private readonly ILogger<TourDataController> _logger = logger;
     private readonly IMapper _mapper = mapper;
     private readonly ITourDataHandler _tourDataHandler = tourDataHandler;
+    private readonly ILocationHandler _locationHandler = locationHandler;
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -60,7 +63,7 @@ public class TourDataController(
     [HttpGet("tours/{tourID}/weatherForecast")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<WeatherForecastDto>> GetTravelInfo(int tourID)
+    public async Task<ActionResult<WeatherForecastDto>> GetWeatherForecastInfo(int tourID)
     {
 
         var response = await _tourDataHandler.GetWeatherForecast(tourID);

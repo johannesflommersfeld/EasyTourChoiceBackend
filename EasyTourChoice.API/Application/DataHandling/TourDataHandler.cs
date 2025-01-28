@@ -63,6 +63,13 @@ public class TourDataHandler(
         }
 
         result.TourData = _mapper.Map<TourDataDto>(tourData);
+
+        var location = await _locationRepository.GetLocationAsync(tourData.ActivityLocationId);
+        result.TourData.ActivityLocation = _mapper.Map<LocationDto>(location);
+
+        location = await _locationRepository.GetLocationAsync(tourData.StartingLocationId);
+        result.TourData.StartingLocation = _mapper.Map<LocationDto>(location);
+
         result.IsSuccess = true;
 
         return result;

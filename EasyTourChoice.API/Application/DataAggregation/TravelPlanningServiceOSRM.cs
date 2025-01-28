@@ -123,8 +123,8 @@ internal record class OSRMGeometry
         {
             var location = new LocationDto()
             {
-                Latitude = coordinate[0],
-                Longitude = coordinate[1],
+                Longitude = coordinate[0],
+                Latitude = coordinate[1],
             };
             locationList.Add(location);
         }

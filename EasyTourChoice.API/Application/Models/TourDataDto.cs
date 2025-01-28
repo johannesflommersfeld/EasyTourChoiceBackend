@@ -12,4 +12,8 @@ public class TourDataDto : TourBase
     public AvalancheReportDto? Bulletin { get; set; }
 
     public WeatherForecastDto? WeatherForecast { get; set; }
+
+    public LocationDto? StartingLocation { get; set; }
+
+    public LocationDto? ActivityLocation { get; set; }
 }
