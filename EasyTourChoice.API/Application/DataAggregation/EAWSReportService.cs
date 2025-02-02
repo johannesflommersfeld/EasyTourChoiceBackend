@@ -43,34 +43,40 @@ public class EAWSReportService(
 
     private async Task FetchLatestAvalancheReportAsync(string language = "en")
     {
+        var listOfTasks = new List<Task>();
         foreach (var url in GetURLs(language))
         {
-            await using Stream stream = await _httpService.PerformGetRequestAsync(url);
-            using var reader = new JsonTextReader(new StreamReader(stream));
-            try
-            {
-                var serializer = new JsonSerializer();
-                var bulletins = (serializer.Deserialize<EAWSReportDto>(reader)?.Bulletins)
-                    ?? throw new JsonException("Could not deserialize the latest avalanche report.");
+            listOfTasks.Add(FetchLatestAvalancheReportFromURLAsync(url));
+        }
+        await Task.WhenAll(listOfTasks);
+    }
 
-                foreach (var bulletin in bulletins)
+    private async Task FetchLatestAvalancheReportFromURLAsync(string url)
+    {
+        using Stream stream = await _httpService.PerformGetRequestAsync(url);
+        try
+        {
+            using var reader = new JsonTextReader(new StreamReader(stream));
+            var serializer = new JsonSerializer();
+            var bulletins = (serializer.Deserialize<EAWSReportDto>(reader)?.Bulletins)
+                ?? throw new JsonException("Could not deserialize the latest avalanche report.");
+
+            foreach (var bulletin in bulletins)
+            {
+                foreach (var region in bulletin.Regions)
                 {
-                    foreach (var region in bulletin.Regions)
-                    {
-                        _reportsRepository.SaveReport(region.RegionID, _mapper.Map<AvalancheReport>(bulletin));
-                    }
+                    _reportsRepository.SaveReport(region.RegionID, _mapper.Map<AvalancheReport>(bulletin));
                 }
             }
-            catch (HttpRequestException e)
-            {
-                _logger.LogError("{Message}", e.Message);
-            }
-            catch (JsonException e)
-            {
-                _logger.LogError("{Message}", e.Message);
-            }
         }
-
+        catch (HttpRequestException e)
+        {
+            _logger.LogError("{Message}", e.Message);
+        }
+        catch (JsonException e)
+        {
+            _logger.LogError("{Message}", e.Message);
+        }
     }
 
     private string[] GetURLs(string language)

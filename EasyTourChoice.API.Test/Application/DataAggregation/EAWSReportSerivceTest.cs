@@ -14,7 +14,7 @@ public class EAWSReportServiceTest
 {
     private ILogger<EAWSReportService> _loggerMock;
     private IHttpService _httpServiceMock;
-    private FileStream _reportStream; 
+    private FileStream _reportStream;
     private IMapper _mapper;
     private IAvalancheReportsRepository _avalancheReportsRepository;
 
@@ -24,7 +24,12 @@ public class EAWSReportServiceTest
         _reportStream = new(Path.Combine("resources", "EAWSReport.json"), FileMode.Open, FileAccess.Read);
         _loggerMock = Substitute.For<ILogger<EAWSReportService>>();
         _httpServiceMock = Substitute.For<IHttpService>();
-        _httpServiceMock.PerformGetRequestAsync(string.Empty).ReturnsForAnyArgs(_reportStream);
+        _httpServiceMock.PerformGetRequestAsync(Arg.Any<string>()).Returns(callInfo =>
+        {
+            // Return a fresh stream for each call to PerformGetRequestAsync
+            var reportStream = new FileStream(Path.Combine("resources", "EAWSReport.json"), FileMode.Open, FileAccess.Read);
+            return reportStream;
+        });
         var mappingConfig = new MapperConfiguration(mc =>
         {
             mc.AddProfile(new AvalancheReportProfile());

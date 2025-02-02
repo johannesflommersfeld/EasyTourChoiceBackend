@@ -14,18 +14,15 @@ public class HttpService(ILogger<HttpService> logger, IHttpClientFactory httpCli
         {
             client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", userAgent);
         }
-        Stream? response = null;
         try
         {
-            var message = new HttpRequestMessage(HttpMethod.Get, url);
-            var httpResponse = await client.SendAsync(message);
-            response = await httpResponse.Content.ReadAsStreamAsync();
-            return response;
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            var httpResponse = await client.SendAsync(request);
+            return await httpResponse.Content.ReadAsStreamAsync();
         }
         catch (HttpRequestException e)
         {
             _logger.LogError(e.Message);
-            response?.Dispose();
             throw;
         }
     }
