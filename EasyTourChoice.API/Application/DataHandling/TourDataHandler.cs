@@ -27,8 +27,18 @@ public class TourDataHandler(
     public async Task<List<TourDataDto>> GetAllToursAsync(ITravelPlanningService travelService)
     {
         var tourData = await _tourDataRepository.GetAllToursAsync();
+        var result = _mapper.Map<List<TourDataDto>>(tourData);
+        foreach (var tour in result)
+        {
+            var location = await _locationRepository.GetLocationAsync(tour.ActivityLocationId);
+            tour.ActivityLocation = _mapper.Map<LocationDto>(location);
+
+            location = await _locationRepository.GetLocationAsync(tour.StartingLocationId);
+            tour.StartingLocation = _mapper.Map<LocationDto>(location);
+        }
+
         // TODO: only include travel time and distance
-        return _mapper.Map<List<TourDataDto>>(tourData);
+        return result;
     }
 
     public async Task<List<TourDataDto>> GetAllToursByActvityAsync(Activity activity)
