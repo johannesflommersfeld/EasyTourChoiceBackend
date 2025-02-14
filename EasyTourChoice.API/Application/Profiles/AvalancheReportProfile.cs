@@ -106,12 +106,7 @@ public class AspectResolver : IValueResolver<EAWSAvalancheProblem, AvalancheProb
             return (Aspect)0b1111_1111;
         }
 
-        var aspect = Aspect.UNKNOWN;
-        foreach (var a in source.Aspects)
-        {
-            aspect |= a;
-        }
-        return aspect;
+        return source.Aspects.Aggregate(Aspect.UNKNOWN, (current, a) => current | a);
     }
 }
 

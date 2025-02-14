@@ -4,6 +4,7 @@ using EasyTourChoice.API.Repositories.Interfaces;
 namespace EasyTourChoice.API.Repositories;
 public class AvalancheReportsRepository : IAvalancheReportsRepository
 {
+    // TODO: use database instead of in memory storage
     private readonly Dictionary<string, AvalancheReport> _reports = [];
 
     public IEnumerable<AvalancheReport> GetAllReports()

@@ -58,6 +58,7 @@ public enum GeneralDifficulty
 }
 
 // uses a bitmap to allow for a combination of different aspects in a single field through an OR operation
+[Flags]
 public enum Aspect
 {
     UNKNOWN = 0,

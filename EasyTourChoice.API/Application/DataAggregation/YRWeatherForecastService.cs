@@ -37,16 +37,17 @@ public class YRWeatherForecastService(
         await using Stream stream =
             await _httpService.PerformGetRequestAsync(GetURL(location), userAgents);
         using var reader = new JsonTextReader(new StreamReader(stream));
+        var serializer = new JsonSerializer();
         try
         {
-            var serializer = new JsonSerializer();
             var response = serializer.Deserialize<YRResponse>(reader);
             var forecast = _mapper.Map<WeatherForecast>(response);
             _weatherRepository.SaveForecast(RoundLocation(location), forecast);
         }
         catch (HttpRequestException e)
         {
-            _logger.LogError("{Message}", e.Message);
+            var errorCode = serializer.Deserialize<Int64>(reader);
+            _logger.LogError("{Message}", $"Error code {errorCode}: {e.Message}");
         }
     }
 

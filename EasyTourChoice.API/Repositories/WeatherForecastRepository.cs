@@ -4,6 +4,7 @@ using EasyTourChoice.API.Repositories.Interfaces;
 namespace EasyTourChoice.API.Repositories;
 public class WeatherForecastRepository : IWeatherForecastRepository
 {
+    // TODO: use database instead of in memory storage
     private readonly Dictionary<Location, WeatherForecast> _forecasts = [];
 
     public IEnumerable<WeatherForecast> GetAllReports()

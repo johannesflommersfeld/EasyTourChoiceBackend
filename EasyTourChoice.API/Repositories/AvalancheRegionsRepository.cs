@@ -4,6 +4,7 @@ using EasyTourChoice.API.Repositories.Interfaces;
 namespace EasyTourChoice.API.Repositories;
 public class AvalancheRegionsRepository : IAvalancheRegionsRepository
 {
+    // TODO: use database instead of in memory storage
     private readonly List<AvalancheRegion> _regions = [];
 
     public IEnumerable<AvalancheRegion> GetAllRegions()
