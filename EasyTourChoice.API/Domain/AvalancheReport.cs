@@ -10,7 +10,7 @@ public record AvalancheReport
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-    
+
     required public DateTime PublicationTime { get; set; }
 
     required public DateTime StartTime { get; set; }
@@ -18,7 +18,7 @@ public record AvalancheReport
     required public DateTime EndTime { get; set; }
 
     required public List<AvalancheProblem> AvalancheProblems { get; set; }
-    
+
     required public List<DangerRating> DangerRatings { get; set; }
 
     required public Dictionary<string, List<string>> ReportBody { get; set; }
@@ -31,7 +31,7 @@ public record AvalancheReport
 
     public bool IsValid()
     {
-        return (StartTime < DateTime.Now) && (EndTime > DateTime.Now);
+        return (StartTime < DateTime.UtcNow) && (EndTime > DateTime.UtcNow);
     }
 }
 
@@ -56,8 +56,8 @@ public record AvalancheProblem
     required public int AvalancheSize { get; set; }
 
     required public Aspect Aspect { get; set; }
-    
-    required public List<AvalancheReport> AvalancheReports { get; set; }
+
+    required public List<AvalancheReport> AvalancheReports { get; set; } = [];
 }
 
 public record DangerRating
@@ -72,7 +72,7 @@ public record DangerRating
     public string? LowerBound { get; set; }
 
     public required ValidTimePeriod ValidTimePeriod { get; set; }
-    
-    required public List<AvalancheReport> AvalancheReports { get; set; }
+
+    required public List<AvalancheReport> AvalancheReports { get; set; } = [];
 
 }

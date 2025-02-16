@@ -66,7 +66,10 @@ public class EAWSReportService(
             {
                 foreach (var region in bulletin.Regions)
                 {
-                    saveTasks.Add(_reportsRepository.SaveReport(region.RegionID, _mapper.Map<AvalancheReport>(bulletin)));
+                    var report = _mapper.Map<AvalancheReport>(bulletin);
+                    report.RegionId = region.RegionID;
+                    report.RegionName = region.Name;
+                    saveTasks.Add(_reportsRepository.SaveReport(report));
                 }
             }
             await Task.WhenAll(saveTasks);

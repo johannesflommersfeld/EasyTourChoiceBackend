@@ -6,5 +6,5 @@ public interface IAvalancheReportsRepository
 {
     Task<IEnumerable<AvalancheReport>> GetAllReports();
     Task<AvalancheReport?> GetReportByRegionID(string regionId);
-    Task SaveReport(string id, AvalancheReport report);
+    Task SaveReport(AvalancheReport report);
 }

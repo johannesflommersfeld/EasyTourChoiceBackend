@@ -15,7 +15,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
     public DbSet<AvalancheReport> AvalancheReports { get; set; }
     public DbSet<DangerRating> DangerRatings { get; set; }
     public DbSet<AvalancheProblem> AvalancheProblems { get; set; }
-    
+
     // TODO add weather report and travel information
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,12 +24,12 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
         modelBuilder.Entity<Location>()
             .Property(e => e.LocationId)
             .ValueGeneratedOnAdd();
-        
+
         // configure Areas
         modelBuilder.Entity<Area>()
             .Property(e => e.AreaId)
             .ValueGeneratedOnAdd();
-        
+
         // configure TourData
         modelBuilder.Entity<TourData>()
             .Property(e => e.Id)
@@ -52,7 +52,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 v => v.ToString(),
                 v => v == null ? null : Enum.Parse<RiskLevel>(v)
             );
-        
+
         // configure AvalancheReport
         modelBuilder.Entity<AvalancheReport>()
             .Property(e => e.Id)
@@ -60,14 +60,34 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
         modelBuilder.Entity<AvalancheReport>()
             .HasMany(r => r.DangerRatings)
             .WithMany(dr => dr.AvalancheReports)
-            .UsingEntity(j => j.ToTable("ReportRatings"));        
+            .UsingEntity<Dictionary<string, object>>(
+                "ReportRatings",
+                j => j.HasOne<DangerRating>()
+                    .WithMany()
+                    .HasForeignKey("DangerRatingsId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<AvalancheReport>()
+                    .WithMany()
+                    .HasForeignKey("AvalancheReportsId")
+                    .OnDelete(DeleteBehavior.Cascade)
+            );
         modelBuilder.Entity<AvalancheReport>()
             .HasMany(r => r.AvalancheProblems)
             .WithMany(p => p.AvalancheReports)
-            .UsingEntity(j => j.ToTable("ReportProblems"));
+            .UsingEntity<Dictionary<string, object>>(
+                "ReportProblems",
+                j => j.HasOne<AvalancheProblem>()
+                    .WithMany()
+                    .HasForeignKey("AvalancheProblemsId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<AvalancheReport>()
+                    .WithMany()
+                    .HasForeignKey("AvalancheReportsId")
+                    .OnDelete(DeleteBehavior.Cascade)
+            );
         var reportBodyConverter = new ValueConverter<Dictionary<string, List<string>>, string>(
             v => JsonSerializer.Serialize(v, new JsonSerializerOptions { WriteIndented = true }), // Serialize, return empty string if null
-            v => JsonSerializer.Deserialize<Dictionary<string, List<string>>>(v, new JsonSerializerOptions { WriteIndented = true }) 
+            v => JsonSerializer.Deserialize<Dictionary<string, List<string>>>(v, new JsonSerializerOptions { WriteIndented = true })
                   ?? new Dictionary<string, List<string>>() // Deserialize, return empty dictionary if null or invalid
         );
         modelBuilder.Entity<AvalancheReport>()
@@ -102,7 +122,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 v => v.ToString(),
                 v => Enum.Parse<Frequency>(v)
             );
-        
+
         // configure DangerRatings
         modelBuilder.Entity<DangerRating>()
             .Property(e => e.Id)
@@ -125,9 +145,9 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
 
     public async Task SeedAsync()
     {
-        
-    await Database.EnsureCreatedAsync();
-    
+
+        await Database.EnsureCreatedAsync();
+
         if (!AvalancheReports.Any())
         {
             List<DangerRating> dangerRatings =
@@ -148,7 +168,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 }
             ];
 
-            List<AvalancheProblem> avalancheProblems = 
+            List<AvalancheProblem> avalancheProblems =
             [
                 new AvalancheProblem
                 {
@@ -181,8 +201,8 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 EndTime = DateTime.Now + TimeSpan.FromDays(1),
                 ReportBody = new Dictionary<string, List<string>>
                 {
-                    ["test1"] = [ "bla", "blub" ],
-                    ["test2"] = [ "hallo", "hallo" ]
+                    ["test1"] = ["bla", "blub"],
+                    ["test2"] = ["hallo", "hallo"]
                 },
                 Tendency = TendencyType.STEADY,
                 AvalancheProblems = avalancheProblems,
@@ -198,7 +218,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
             {
                 problem.AvalancheReports.Add(avalancheReport);
             }
-            
+
             AvalancheReports.Add(avalancheReport);
             DangerRatings.AddRange(dangerRatings);
             AvalancheProblems.AddRange(avalancheProblems);
@@ -218,6 +238,12 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                     Latitude = 46.968062,
                     Longitude = 9.815114,
                     Altitude = 1_410,
+                },
+                new Location
+                {
+                    Latitude = 47.0107309,
+                    Longitude = 11.1542867,
+                    Altitude = 1_740,
                 }
             );
         }
@@ -235,6 +261,11 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 {
                     Name = "St. Antoenien",
                     LocationId = Locations.ToList()[1].LocationId,
+                },
+                new Area()
+                {
+                    Name = "Stubai",
+                    LocationId = Locations.ToList()[2].LocationId,
                 }
             );
             await SaveChangesAsync();
@@ -266,14 +297,28 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                     ShortDescription = "Another non existing ski tour for testing.",
                     Risk = RiskLevel.HIGH_RISK,
                     AreaId = Areas.ToList()[1].AreaId,
+                },
+                new TourData()
+                {
+                    Name = "Stubaier Gröstl",
+                    ActivityType = Activity.SKITOURING,
+                    StartingLocationId = Locations.ToList()[2].LocationId,
+                    ActivityLocationId = Locations.ToList()[2].LocationId,
+                    Duration = 3.5f,
+                    Distance = 4,
+                    MetersOfElevation = 900,
+                    ShortDescription = "Random ski tour in Stubai",
+                    Risk = RiskLevel.SAFE,
+                    AreaId = Areas.ToList()[2].AreaId,
                 }
             );
             await SaveChangesAsync();
         }
     }
-    
+
     public async Task CleanupExpiredAvalancheReportsAsync()
     {
+        //TODO clean up ReportRatings and ReportProblems
         // Delete all expired avalanche reports
         var expiredReports = AvalancheReports
             .Where(ar => ar.EndTime < DateTime.Now)

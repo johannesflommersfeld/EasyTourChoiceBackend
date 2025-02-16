@@ -3,13 +3,13 @@ namespace EasyTourChoice.API.Application.DataAggregation;
 
 public class AvalancheReportCleanupService : IHostedService, IDisposable
 {
-    private readonly TourDataContext _context;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<AvalancheReportCleanupService> _logger;
     private Timer? _timer;
 
-    public AvalancheReportCleanupService(TourDataContext context, ILogger<AvalancheReportCleanupService> logger)
+    public AvalancheReportCleanupService(IServiceScopeFactory scopeFactory, ILogger<AvalancheReportCleanupService> logger)
     {
-        _context = context;
+        _scopeFactory = scopeFactory;
         _logger = logger;
     }
 
@@ -36,7 +36,9 @@ public class AvalancheReportCleanupService : IHostedService, IDisposable
     {
         try
         {
-            await _context.CleanupExpiredAvalancheReportsAsync();
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<TourDataContext>();
+            await context.CleanupExpiredAvalancheReportsAsync();
             _logger.LogInformation("Avalanche report cleanup completed.");
         }
         catch (Exception ex)
