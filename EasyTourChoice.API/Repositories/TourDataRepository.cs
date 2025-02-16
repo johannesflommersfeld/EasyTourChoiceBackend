@@ -64,7 +64,7 @@ public class TourDataRepository(TourDataContext context) : ITourDataRepository
             }
         }
 
-        _context.Tours.Add(tourData);
+        await _context.Tours.AddAsync(tourData);
     }
 
     public async Task<bool> SaveChangesAsync()

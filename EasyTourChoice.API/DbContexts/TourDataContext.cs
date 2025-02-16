@@ -3,7 +3,6 @@ using EasyTourChoice.API.Domain;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace EasyTourChoice.API.DbContexts;
@@ -131,26 +130,26 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
     
         if (!AvalancheReports.Any())
         {
-            List<DangerRating> dangerRatings = new()
-            {
+            List<DangerRating> dangerRatings =
+            [
                 new DangerRating
                 {
                     MainValue = AvalancheDangerRating.LOW,
                     ValidTimePeriod = ValidTimePeriod.ALL_DAY,
                     UpperBound = "treeline",
-                    AvalancheReports = new List<AvalancheReport>(),
+                    AvalancheReports = [],
                 },
                 new DangerRating
                 {
                     MainValue = AvalancheDangerRating.MODERATE,
                     ValidTimePeriod = ValidTimePeriod.ALL_DAY,
                     LowerBound = "treeline",
-                    AvalancheReports = new List<AvalancheReport>(),
+                    AvalancheReports = [],
                 }
-            };
+            ];
 
-            List<AvalancheProblem> avalancheProblems = new()
-            {
+            List<AvalancheProblem> avalancheProblems = 
+            [
                 new AvalancheProblem
                 {
                     ProblemType = AvalancheProblemType.WIND_SLAB,
@@ -160,7 +159,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                     Frequency = Frequency.FEW,
                     AvalancheSize = 2,
                     Aspect = (Aspect)0b1000_0011,
-                    AvalancheReports = new List<AvalancheReport>(),
+                    AvalancheReports = [],
                 },
                 new AvalancheProblem
                 {
@@ -171,9 +170,9 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                     Frequency = Frequency.FEW,
                     AvalancheSize = 1,
                     Aspect = (Aspect)0b0011_1000,
-                    AvalancheReports = new List<AvalancheReport>(),
+                    AvalancheReports = [],
                 }
-            };
+            ];
 
             var avalancheReport = new AvalancheReport
             {
@@ -182,29 +181,25 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 EndTime = DateTime.Now + TimeSpan.FromDays(1),
                 ReportBody = new Dictionary<string, List<string>>
                 {
-                    ["test1"] = new List<string> { "bla", "blub" },
-                    ["test2"] = new List<string> { "hallo", "hallo" }
+                    ["test1"] = [ "bla", "blub" ],
+                    ["test2"] = [ "hallo", "hallo" ]
                 },
                 Tendency = TendencyType.STEADY,
                 AvalancheProblems = avalancheProblems,
                 DangerRatings = dangerRatings,
             };
 
-            // Now, for each DangerRating, we need to add the AvalancheReport to its list
             foreach (var dangerRating in dangerRatings)
             {
                 dangerRating.AvalancheReports.Add(avalancheReport);
             }
 
-            // Finally, persist the AvalancheReport
-            AvalancheReports.Add(avalancheReport);
-
-            // Add AvalancheProblems to AvalancheReports list
             foreach (var problem in avalancheProblems)
             {
                 problem.AvalancheReports.Add(avalancheReport);
             }
-
+            
+            AvalancheReports.Add(avalancheReport);
             DangerRatings.AddRange(dangerRatings);
             AvalancheProblems.AddRange(avalancheProblems);
         }
@@ -276,5 +271,28 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
             await SaveChangesAsync();
         }
     }
-    // TODO: Implement cleanup logic that is called every evening.
+    
+    public async Task CleanupExpiredAvalancheReportsAsync()
+    {
+        // Delete all expired avalanche reports
+        var expiredReports = AvalancheReports
+            .Where(ar => ar.EndTime < DateTime.Now)
+            .ToList();
+        AvalancheReports.RemoveRange(expiredReports);
+        await SaveChangesAsync();
+
+        // Delete all avalanche problems and danger ratings that are no longer referenced
+        var unreferencedProblems = AvalancheProblems
+            .Where(p => !p.AvalancheReports.Any())
+            .ToList();
+
+        var unreferencedRatings = DangerRatings
+            .Where(r => !r.AvalancheReports.Any())
+            .ToList();
+
+        AvalancheProblems.RemoveRange(unreferencedProblems);
+        DangerRatings.RemoveRange(unreferencedRatings);
+
+        await SaveChangesAsync();
+    }
 }

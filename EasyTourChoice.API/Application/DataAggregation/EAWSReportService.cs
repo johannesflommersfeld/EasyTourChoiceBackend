@@ -20,16 +20,16 @@ public class EAWSReportService(
     private readonly IAvalancheReportsRepository _reportsRepository = avalancheReportsRepository;
 
 #if DEBUG
-    public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID, bool mustBeValid = true)
+    public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionId, bool mustBeValid = true)
 #else
     public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID)
 #endif
     {
-        var report = _reportsRepository.GetReportByRegionID(regionID);
+        var report = await _reportsRepository.GetReportByRegionID(regionId);
         if (report is null || !report.IsValid())
         {
             await FetchLatestAvalancheReportAsync();
-            report = _reportsRepository.GetReportByRegionID(regionID);
+            report = await _reportsRepository.GetReportByRegionID(regionId);
         }
 
         if (report is null)
@@ -58,16 +58,18 @@ public class EAWSReportService(
         {
             using var reader = new JsonTextReader(new StreamReader(stream));
             var serializer = new JsonSerializer();
-            var bulletins = (serializer.Deserialize<EAWSReportDto>(reader)?.Bulletins)
+            var bulletins = serializer.Deserialize<EAWSReportDto>(reader)?.Bulletins
                 ?? throw new JsonException("Could not deserialize the latest avalanche report.");
 
+            List<Task> saveTasks = [];
             foreach (var bulletin in bulletins)
             {
                 foreach (var region in bulletin.Regions)
                 {
-                    _reportsRepository.SaveReport(region.RegionID, _mapper.Map<AvalancheReport>(bulletin));
+                    saveTasks.Add(_reportsRepository.SaveReport(region.RegionID, _mapper.Map<AvalancheReport>(bulletin)));
                 }
             }
+            await Task.WhenAll(saveTasks);
         }
         catch (HttpRequestException e)
         {

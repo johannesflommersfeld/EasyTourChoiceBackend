@@ -4,7 +4,7 @@ namespace EasyTourChoice.API.Repositories.Interfaces;
 
 public interface IAvalancheReportsRepository
 {
-    IEnumerable<AvalancheReport> GetAllReports();
-    AvalancheReport? GetReportByRegionID(string id);
-    void SaveReport(string ID, AvalancheReport report);
+    Task<IEnumerable<AvalancheReport>> GetAllReports();
+    Task<AvalancheReport?> GetReportByRegionID(string regionId);
+    Task SaveReport(string id, AvalancheReport report);
 }
