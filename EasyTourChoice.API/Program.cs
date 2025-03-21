@@ -19,7 +19,7 @@ builder.Services.AddScoped<IWeatherForecastService, YRWeatherForecastService>();
 // TODO: replace key strings by enums
 builder.Services.AddKeyedScoped<ITravelPlanningService, TravelPlanningServiceOSRM>("OSRM");
 builder.Services.AddKeyedScoped<ITravelPlanningService, TravelPlanningServiceTomTom>("TomTom");
-builder.Services.AddScoped<IAvalancheRegionService, EAWSRegionService>();
+builder.Services.AddScoped<IAvalancheRegionService, EawsRegionService>();
 builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 builder.Services.AddScoped<IAvalancheRegionsRepository, AvalancheRegionsRepository>();
 builder.Services.AddScoped<IAvalancheReportsRepository, AvalancheReportsRepository>();

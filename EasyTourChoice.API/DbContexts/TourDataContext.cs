@@ -15,6 +15,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
     public DbSet<AvalancheReport> AvalancheReports { get; set; }
     public DbSet<DangerRating> DangerRatings { get; set; }
     public DbSet<AvalancheProblem> AvalancheProblems { get; set; }
+    public DbSet<AvalancheRegion> AvalancheRegions { get; set; }
 
     // TODO add weather report and travel information
 
@@ -139,6 +140,24 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 v => v.ToString(),
                 v => Enum.Parse<ValidTimePeriod>(v)
             );
+
+        // configure AvalancheRegion
+        modelBuilder.Entity<AvalancheRegion>()
+            .HasKey(e => e.Id);
+        modelBuilder.Entity<AvalancheRegion>()
+            .Property(e => e.Type)
+            .HasConversion(
+                v => v.ToString(),
+                v => Enum.Parse<GeometryType>(v)
+            );
+        var geometryConverter = new ValueConverter<ICollection<ICollection<ICollection<double>>>, string>(
+            v => JsonSerializer.Serialize(v, new JsonSerializerOptions { WriteIndented = true }),
+            v => JsonSerializer.Deserialize<ICollection<ICollection<ICollection<double>>>>(v, new JsonSerializerOptions { WriteIndented = true })
+                  ?? new List<ICollection<ICollection<double>>>()
+        );
+        modelBuilder.Entity<AvalancheRegion>()
+            .Property(e => e.Polygons)
+            .HasConversion(geometryConverter);
 
         base.OnModelCreating(modelBuilder);
     }

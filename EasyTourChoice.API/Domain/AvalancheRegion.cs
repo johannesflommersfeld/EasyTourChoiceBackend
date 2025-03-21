@@ -1,10 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using EasyTourChoice.API.Application.Models;
 
 namespace EasyTourChoice.API.Domain;
 
 public record AvalancheRegion
 {
-    required public string Id { get; set; }
-    required public GeometryType Type { get; set; }
-    required public ICollection<ICollection<ICollection<double>>> Polygons { get; set; }
+    [Key]
+    public required string Id { get; init; }
+    public required GeometryType Type { get; init; }
+    public required ICollection<ICollection<ICollection<double>>> Polygons { get; init; }
 }

@@ -7,15 +7,15 @@ using YamlDotNet.Serialization;
 
 namespace EasyTourChoice.API.Domain;
 
-public class EAWSRegionService : IAvalancheRegionService
+public class EawsRegionService : IAvalancheRegionService
 {
     private readonly ILogger _logger;
     private readonly IHttpService _httpService;
     private readonly IAvalancheRegionsRepository _avalancheRegionsRepository;
     private readonly Dictionary<string, string> _regionNames;
 
-    public EAWSRegionService(
-        ILogger<EAWSRegionService> logger,
+    public EawsRegionService(
+        ILogger<EawsRegionService> logger,
         IHttpService httpService,
         IAvalancheRegionsRepository avalancheRegionsRepository
     )
@@ -33,11 +33,23 @@ public class EAWSRegionService : IAvalancheRegionService
     public async Task<string?> GetRegionIDAsync(LocationBase location)
     {
         var regions = _avalancheRegionsRepository.GetAllRegions();
-        if (!regions.Any())
+        if (regions.Count == 0)
         {
             await LoadRegionsAsync();
             regions = _avalancheRegionsRepository.GetAllRegions();
         }
+
+        var regionId = SearchInRegions(location, regions);
+        if (regionId is not null) return regionId;
+
+        // check if new regions were added.
+        await LoadRegionsAsync();
+        regions = _avalancheRegionsRepository.GetAllRegions();
+        return SearchInRegions(location, regions);
+    }
+
+    private string? SearchInRegions(LocationBase location, IEnumerable<AvalancheRegion> regions)
+    {
         foreach (AvalancheRegion region in regions)
         {
             foreach (ICollection<ICollection<double>> polygon in region.Polygons)
@@ -58,8 +70,8 @@ public class EAWSRegionService : IAvalancheRegionService
 
     private async Task LoadRegionsAsync()
     {
-        await using Stream stream = await _httpService.PerformGetRequestAsync(GetURL());
-        using var reader = new JsonTextReader(new StreamReader(stream));
+        await using var stream = await _httpService.PerformGetRequestAsync(GetUrl());
+        await using var reader = new JsonTextReader(new StreamReader(stream));
         try
         {
             var serializer = new JsonSerializer();
@@ -91,7 +103,7 @@ public class EAWSRegionService : IAvalancheRegionService
     {
         // Implements winding number algorithm.
         // see https://web.archive.org/web/20130126163405/http://geomalgorithms.com/a03-_inclusion.html
-        int windingNumber = 0;
+        var windingNumber = 0;
         for (var i = 0; i < polygon.Count; i++)
         {
             var p1 = polygon[i];
@@ -111,15 +123,15 @@ public class EAWSRegionService : IAvalancheRegionService
 
             // Determine on which side of the edge, the point is located
             // see https://www.cs.drexel.edu/~deb39/Classes/Papers/comp175-06-pineda.pdf
-            var EdgeFunctionValue =
+            var edgeFunctionValue =
                 (location.Latitude - p1.Latitude) * (p2.Longitude - p1.Longitude)
                 - (location.Longitude - p1.Longitude) * (p2.Latitude - p1.Latitude);
-            windingNumber += EdgeFunctionValue > 0 ? 1 : -1;
+            windingNumber += edgeFunctionValue > 0 ? 1 : -1;
         }
         return Math.Abs(windingNumber) % 2 == 1;
     }
 
-    private string GetURL()
+    private static string GetUrl()
     {
         // TODO: move to configuration file
         return "https://regions.avalanches.org/micro-regions.geojson";

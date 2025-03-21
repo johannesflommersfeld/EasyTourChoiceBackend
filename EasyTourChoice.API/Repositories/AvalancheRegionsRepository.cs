@@ -1,24 +1,36 @@
+using EasyTourChoice.API.DbContexts;
 using EasyTourChoice.API.Domain;
 using EasyTourChoice.API.Repositories.Interfaces;
 
 namespace EasyTourChoice.API.Repositories;
-public class AvalancheRegionsRepository : IAvalancheRegionsRepository
+public class AvalancheRegionsRepository(TourDataContext context) : IAvalancheRegionsRepository
 {
-    // TODO: use database instead of in memory storage
-    private readonly List<AvalancheRegion> _regions = [];
+    private readonly TourDataContext _context = context ?? throw new ArgumentNullException(nameof(context));
 
-    public IEnumerable<AvalancheRegion> GetAllRegions()
+    public List<AvalancheRegion> GetAllRegions()
     {
-        return _regions;
+        return _context.AvalancheRegions.ToList();
     }
 
-    public AvalancheRegion? GetRegionById(string ID)
+    public AvalancheRegion? GetRegionById(string id)
     {
-        return _regions.First(r => r.Id == ID);
+        return _context.AvalancheRegions.FirstOrDefault(r => r.Id == id);
     }
 
     public void SaveRegion(AvalancheRegion region)
     {
-        _regions.Add(region);
+        var existingRegion = _context.AvalancheRegions.FirstOrDefault(r => r.Id == region.Id);
+
+        if (existingRegion is null)
+        {
+            // Add new region
+            _context.AvalancheRegions.Add(region);
+        }
+        else
+        {
+            _context.Entry(existingRegion).CurrentValues.SetValues(region);
+        }
+
+        _context.SaveChanges();
     }
 }
