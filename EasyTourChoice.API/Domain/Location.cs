@@ -8,5 +8,5 @@ public class Location : LocationBase
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int LocationId { get; set; }
+    public int? LocationId { get; set; }
 }

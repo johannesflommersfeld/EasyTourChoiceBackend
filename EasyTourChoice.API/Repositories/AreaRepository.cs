@@ -23,6 +23,12 @@ public class AreaRepository(TourDataContext context) : IAreaRepository
     {
         return await _context.Areas.AnyAsync(l => l.AreaId == id);
     }
+    
+    public async Task<int?> FindAreaAsync(string name)
+    {
+        var areaList = await _context.Areas.ToListAsync();
+        return areaList.Find(area => area.Name == name)?.LocationId;
+    }
 
     public async Task<bool> SaveChangesAsync()
     {

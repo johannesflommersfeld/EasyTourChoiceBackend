@@ -19,7 +19,7 @@ public class Area
     public Location? Location { get; set; }
     
     [Required]
-    public required int LocationId { get; set; }
+    public required int? LocationId { get; set; }
 
     public ICollection<TourData> Tours { get; set; } = [];
 }

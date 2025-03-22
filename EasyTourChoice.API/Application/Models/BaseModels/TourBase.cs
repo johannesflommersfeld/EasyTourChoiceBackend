@@ -12,9 +12,9 @@ public class TourBase
 
     public Activity ActivityType { get; set; }
 
-    public int StartingLocationId { get; set; }
+    public int? StartingLocationId { get; set; }
 
-    public int ActivityLocationId { get; set; }
+    public int? ActivityLocationId { get; set; }
 
     public float? Duration { get; set; } // expected activity time in hours
 
@@ -34,7 +34,7 @@ public class TourBase
     [Aspect]
     public byte? Aspect { get; set; } // encodes the encountered aspects (see definition in Types.cs)
 
-    public int AreaId { get; set; }
+    public int? AreaId { get; set; }
 
-    public string? AvalancheRegionID { get; set; }
+    public string? AvalancheRegionId { get; set; }
 }

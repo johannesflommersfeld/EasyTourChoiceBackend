@@ -9,7 +9,7 @@ public class TourData : TourBase
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public int? Id { get; set; }
 
     [Location]
     [ForeignKey("StartingLocationId")]

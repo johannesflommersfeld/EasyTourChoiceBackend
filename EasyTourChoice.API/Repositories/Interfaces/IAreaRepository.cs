@@ -6,7 +6,8 @@ public interface IAreaRepository
 {
     Task<IEnumerable<Area>> GetAllAreasAsync();
     Task<Area?> GetAreaByIdAsync(int id);
-    Task<bool> AreaExistsAsync(int id);
+    Task<bool> AreaExistsAsync(int id); 
+    Task<int?> FindAreaAsync(string name);
     Task<bool> SaveChangesAsync();
 }
 

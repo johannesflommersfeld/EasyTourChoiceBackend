@@ -447,7 +447,7 @@ public enum WeatherSymbol
     RAINSHOWERS_POLARTWILIGHT,
     [System.Runtime.Serialization.EnumMember(Value = "snowandthunder")]
     SNOW_AND_THUNDER,
-    [System.Runtime.Serialization.EnumMember(Value = "leetshowers_day")]
+    [System.Runtime.Serialization.EnumMember(Value = "sleetshowers_day")]
     LEET_SHOWERS_DAY,
     [System.Runtime.Serialization.EnumMember(Value = "sleetshowers_night")]
     SLEET_SHOWERS_NIGHT,

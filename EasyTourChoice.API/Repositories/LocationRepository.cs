@@ -19,6 +19,17 @@ public class LocationRepository(TourDataContext context) : ILocationRepository
         return await _context.Locations.Where(l => l.LocationId == id).FirstOrDefaultAsync();
     }
 
+    public async Task<int?> FindLocationAsync(Location location)
+    {
+        var locationList = await _context.Locations.ToListAsync();
+        return locationList.Find(l => l == location)?.LocationId;
+    }
+
+    public async Task AddLocationAsync(Location location)
+    {
+        await _context.Locations.AddAsync(location);
+    }
+
     public async Task<bool> SaveChangesAsync()
     {
         return await _context.SaveChangesAsync() >= 0;

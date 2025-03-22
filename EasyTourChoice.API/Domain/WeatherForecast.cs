@@ -15,7 +15,7 @@ public record WeatherForecast
     required public List<ForecastTimeStep> Timeseries { get; set; }
 
     // Foreign key for Location
-    public int LocationId { get; set; }
+    public int? LocationId { get; set; }
 
     [ForeignKey("LocationId")]
     public Location? Location { get; set; }

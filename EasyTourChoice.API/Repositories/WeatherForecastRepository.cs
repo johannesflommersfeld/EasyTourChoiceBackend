@@ -32,6 +32,11 @@ public class WeatherForecastRepository(TourDataContext context) : IWeatherForeca
 
     public void SaveForecast(Location location, WeatherForecast forecast)
     {
+        if (location.LocationId is null)
+        {
+            
+        }
+        
         // Round the location to match how it's stored when fetched from YR API
         var roundedLocation = LocationUtils.RoundLocation(location);
         var roundedLatitude = roundedLocation.Latitude;

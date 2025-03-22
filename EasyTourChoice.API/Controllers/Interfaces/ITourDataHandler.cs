@@ -7,18 +7,18 @@ namespace EasyTourChoice.API.Controllers.Interfaces;
 public interface ITourDataHandler
 {
     Task CreateTourAsync(TourData tour);
-    Task<TourDataResult> UpdateTourAsync(int tourID, TourDataForUpdateDto tourToPatch);
-    Task<TourDataDto?> GetPlainTourByIDAsync(int tourID);
-    Task<TourDataResult> GetTourByIDAsync(int tourID);
-    Task<TravelInfoResult> GetTravelInfoAsync(int tourID, Location userLocation, ITravelPlanningService travelService);
-    Task<WeatherForecastResult> GetWeatherForecast(int tourID);
-    Task<BulletinResult> GetBulletinAsync(int tourID);
+    Task<TourDataResult> UpdateTourAsync(int tourId, TourDataForUpdateDto tourToPatch);
+    Task<TourDataDto?> GetPlainTourByIDAsync(int tourId);
+    Task<TourDataResult> GetTourByIDAsync(int tourId);
+    Task<TravelInfoResult> GetTravelInfoAsync(int tourId, Location userLocation, ITravelPlanningService travelService);
+    Task<WeatherForecastResult> GetWeatherForecast(int tourId);
+    Task<BulletinResult> GetBulletinAsync(int tourId);
 
-    Task<bool> TourExistsAsync(int tourID);
+    Task<bool> TourExistsAsync(int tourId);
     // TODO: allow for filtering and sorting
     Task<List<TourDataDto>> GetAllToursAsync(ITravelPlanningService travelService);
     Task<List<TourDataDto>> GetAllToursByActvityAsync(Activity activity);
-    Task<List<TourDataDto>> GetAllToursByAreaAsync(int areaID);
+    Task<List<TourDataDto>> GetAllToursByAreaAsync(int areaId);
 }
 
 public record TourDataResult

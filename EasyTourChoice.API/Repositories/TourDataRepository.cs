@@ -31,39 +31,6 @@ public class TourDataRepository(TourDataContext context) : ITourDataRepository
 
     public async Task AddTourAsync(TourData tourData)
     {
-        if (tourData.StartingLocation != null)
-        {
-            var locationList = await _context.Locations.ToListAsync();
-            var location = locationList.Find(l => l == tourData.StartingLocation);
-
-            if (location != null)
-            {
-                tourData.StartingLocationId = location.LocationId;
-                tourData.StartingLocation = null;
-            }
-        }
-
-        if (tourData.ActivityLocation != null)
-        {
-            var locationList = await _context.Locations.ToListAsync();
-            var location = locationList.Find(l => l == tourData.ActivityLocation);
-            if (location != null)
-            {
-                tourData.ActivityLocationId = location.LocationId;
-                tourData.ActivityLocation = null;
-            }
-        }
-
-        if (tourData.Area != null)
-        {
-            var area = await _context.Areas.Where(a => a.Name == tourData.Area.Name).FirstOrDefaultAsync();
-            if (area != null)
-            {
-                tourData.AreaId = area.AreaId;
-                tourData.Area = null;
-            }
-        }
-
         await _context.Tours.AddAsync(tourData);
     }
 
