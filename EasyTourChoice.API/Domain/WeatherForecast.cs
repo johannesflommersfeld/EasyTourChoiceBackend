@@ -1,113 +1,125 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using EasyTourChoice.API.Application.DataAggregation;
 
 namespace EasyTourChoice.API.Domain;
 
 public record WeatherForecast
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+
     required public Meta Meta { get; set; }
 
     required public List<ForecastTimeStep> Timeseries { get; set; }
+
+    // Foreign key for Location
+    public int LocationId { get; set; }
+
+    [ForeignKey("LocationId")]
+    public Location? Location { get; set; }
 }
 
 public record Meta
 {
-    required public DateTime UpdatedAt { get; set; }
+    public required DateTime UpdatedAt { get; init; }
 
-    required public ForecastUnits Units { get; set; }
+    public required ForecastUnits Units { get; init; }
 }
 
 // TODO: remove everything that is not used in the frontend
 public record ForecastUnits
 {
-    required public string AirPressureAtSeaLevel { get; set; }
-    required public string AirTemperature { get; set; }
-    required public string AirTemperatureMax { get; set; }
-    required public string AirTemperatureMin { get; set; }
-    required public string CloudAreaFraction { get; set; }
-    required public string CloudAreaFractionHigh { get; set; }
-    required public string CloudAreaFractionLow { get; set; }
-    required public string CloudAreaFractionMedium { get; set; }
-    required public string DewPointTemperature { get; set; }
-    required public string FogAreaFraction { get; set; }
-    required public string PrecipitationAmount { get; set; }
-    required public string PrecipitationAmountMax { get; set; }
-    required public string PrecipitationAmountMin { get; set; }
-    required public string ProbabilityOfPrecipitation { get; set; }
-    required public string ProbabilityOfThunder { get; set; }
-    required public string RelativeHumidity { get; set; }
-    required public string UVIndexClearSkyMax { get; set; }
-    required public string WindFromDirection { get; set; }
-    required public string WindSpeed { get; set; }
-    required public string WindSpeedOfGusts { get; set; }
+    public required string AirPressureAtSeaLevel { get; init; }
+    public required string AirTemperature { get; init; }
+    public required string AirTemperatureMax { get; init; }
+    public required string AirTemperatureMin { get; init; }
+    public required string CloudAreaFraction { get; init; }
+    public required string CloudAreaFractionHigh { get; init; }
+    public required string CloudAreaFractionLow { get; init; }
+    public required string CloudAreaFractionMedium { get; init; }
+    public required string DewPointTemperature { get; init; }
+    public required string FogAreaFraction { get; init; }
+    public required string PrecipitationAmount { get; init; }
+    public required string PrecipitationAmountMax { get; init; }
+    public required string PrecipitationAmountMin { get; init; }
+    public required string ProbabilityOfPrecipitation { get; init; }
+    public required string ProbabilityOfThunder { get; init; }
+    public required string RelativeHumidity { get; init; }
+    public required string UvIndexClearSkyMax { get; init; }
+    public required string WindFromDirection { get; init; }
+    public required string WindSpeed { get; init; }
+    public required string WindSpeedOfGusts { get; init; }
 }
 
 public record ForecastTimeStep
 {
-    required public DateTime Time { get; set; }
+    public required DateTime Time { get; init; }
 
-    required public ForecastData Data { get; set; }
+    public required ForecastData Data { get; init; }
 }
 
 public record ForecastData
 {
     // Parameters which applies to this exact point in time.
-    required public ForecastTimeInstant Instant { get; set; }
+    public required ForecastTimeInstant Instant { get; init; }
 
     // Parameters with validity times over one hour. Will not exist for all time steps.
-    required public ForecastTimePeriod NextOneHours { get; set; }
+    public required ForecastTimePeriod NextOneHours { get; init; }
 }
 
 // TODO: remove everything that is not needed in the frontend
 public record ForecastTimeInstant
 {
-    public double? AirPressureAtSeaLevel { get; set; }
+    public double? AirPressureAtSeaLevel { get; init; }
 
-    public double? AirTemperature { get; set; }
+    public double? AirTemperature { get; init; }
 
-    public double? CloudAreaFraction { get; set; }
+    public double? CloudAreaFraction { get; init; }
 
-    public double? CloudAreaFractionHigh { get; set; }
+    public double? CloudAreaFractionHigh { get; init; }
 
-    public double? CloudAreaFractionLow { get; set; }
+    public double? CloudAreaFractionLow { get; init; }
 
-    public double? CloudAreaFractionMedium { get; set; }
+    public double? CloudAreaFractionMedium { get; init; }
 
-    public double? DewPointTemperature { get; set; }
+    public double? DewPointTemperature { get; init; }
 
-    public double? FogAreaFraction { get; set; }
+    public double? FogAreaFraction { get; init; }
 
-    public double? RelativeHumidity { get; set; }
+    public double? RelativeHumidity { get; init; }
 
-    public double? WindFromDirection { get; set; }
+    public double? WindFromDirection { get; init; }
 
-    public double? WindSpeed { get; set; }
+    public double? WindSpeed { get; init; }
 
-    public double? WindSpeedOfGusts { get; set; }
+    public double? WindSpeedOfGusts { get; init; }
 }
 
 public record ForecastTimePeriod
 {
-    required public ForecastTimePeriodDetails? Details { get; set; }
+    public required ForecastTimePeriodDetails? Details { get; init; }
 
-    required public WeatherSymbol? SymbolCode { get; set; }
+    public required WeatherSymbol? SymbolCode { get; init; }
 }
 
 // TODO: remove everything that is not needed in the frontend
 public record ForecastTimePeriodDetails
 {
-    public double? AirTemperatureMax { get; set; }
+    public double? AirTemperatureMax { get; init; }
 
-    public double? AirTemperatureMin { get; set; }
+    public double? AirTemperatureMin { get; init; }
 
-    public double? PrecipitationAmount { get; set; }
+    public double? PrecipitationAmount { get; init; }
 
-    public double? PrecipitationAmountMax { get; set; }
+    public double? PrecipitationAmountMax { get; init; }
 
-    public double? PrecipitationAmountMin { get; set; }
+    public double? PrecipitationAmountMin { get; init; }
 
-    public double? ProbabilityOfPrecipitation { get; set; }
+    public double? ProbabilityOfPrecipitation { get; init; }
 
-    public double? ProbabilityOfThunder { get; set; }
+    public double? ProbabilityOfThunder { get; init; }
 
-    public double? UVIndexClearSkyMax { get; set; }
+    public double? UvIndexClearSkyMax { get; init; }
 }

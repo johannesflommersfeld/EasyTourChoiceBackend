@@ -16,8 +16,9 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
     public DbSet<DangerRating> DangerRatings { get; set; }
     public DbSet<AvalancheProblem> AvalancheProblems { get; set; }
     public DbSet<AvalancheRegion> AvalancheRegions { get; set; }
+    public DbSet<WeatherForecast> WeatherForecasts { get; set; }
 
-    // TODO add weather report and travel information
+    // TODO add travel information
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -158,6 +159,64 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
         modelBuilder.Entity<AvalancheRegion>()
             .Property(e => e.Polygons)
             .HasConversion(geometryConverter);
+
+        // configure WeatherForecast
+        modelBuilder.Entity<WeatherForecast>()
+            .Property(e => e.Id)
+            .ValueGeneratedOnAdd();
+
+        // Keep Meta as a regular entity (not serialized) so it can be queried
+        modelBuilder.Entity<WeatherForecast>()
+            .OwnsOne(e => e.Meta, meta =>
+            {
+                meta.Property(m => m.UpdatedAt).HasColumnName("UpdatedAt");
+                // ForecastUnits will be stored as JSON since we don't need to query it
+                meta.Property(m => m.Units).HasColumnName("Units").HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions { WriteIndented = true }),
+                    v => JsonSerializer.Deserialize<ForecastUnits>(v, new JsonSerializerOptions { WriteIndented = true })
+                    ??
+                    new ForecastUnits
+                    {
+                        AirPressureAtSeaLevel = string.Empty,
+                        AirTemperature = string.Empty,
+                        AirTemperatureMax = string.Empty,
+                        AirTemperatureMin = string.Empty,
+                        CloudAreaFraction = string.Empty,
+                        CloudAreaFractionHigh = string.Empty,
+                        CloudAreaFractionLow = string.Empty,
+                        CloudAreaFractionMedium = string.Empty,
+                        DewPointTemperature = string.Empty,
+                        FogAreaFraction = string.Empty,
+                        PrecipitationAmount = string.Empty,
+                        PrecipitationAmountMax = string.Empty,
+                        PrecipitationAmountMin = string.Empty,
+                        ProbabilityOfPrecipitation = string.Empty,
+                        ProbabilityOfThunder = string.Empty,
+                        RelativeHumidity = string.Empty,
+                        UvIndexClearSkyMax = string.Empty,
+                        WindFromDirection = string.Empty,
+                        WindSpeed = string.Empty,
+                        WindSpeedOfGusts = string.Empty,
+                    }
+                );
+            });
+
+        // Serialize the timeseries as JSON since it's complex and we don't need to query it
+        var timeseriesConverter = new ValueConverter<List<ForecastTimeStep>, string>(
+            v => JsonSerializer.Serialize(v, new JsonSerializerOptions { WriteIndented = true }),
+            v => JsonSerializer.Deserialize<List<ForecastTimeStep>>(v, new JsonSerializerOptions { WriteIndented = true })
+                  ?? new List<ForecastTimeStep>()
+        );
+
+        modelBuilder.Entity<WeatherForecast>()
+            .Property(e => e.Timeseries)
+            .HasConversion(timeseriesConverter);
+
+        modelBuilder.Entity<WeatherForecast>()
+            .HasOne(w => w.Location)
+            .WithMany()
+            .HasForeignKey(w => w.LocationId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }

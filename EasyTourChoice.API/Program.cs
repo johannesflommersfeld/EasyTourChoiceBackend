@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddScoped<IAvalancheReportService, EAWSReportService>();
+builder.Services.AddHostedService<WeatherForecastsCleanupService>();
 builder.Services.AddHostedService<AvalancheReportCleanupService>();
 builder.Services.AddScoped<IWeatherForecastService, YRWeatherForecastService>();
 // TODO: replace key strings by enums

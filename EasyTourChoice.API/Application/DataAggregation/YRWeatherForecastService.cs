@@ -21,11 +21,12 @@ public class YRWeatherForecastService(
 
     public async Task<WeatherForecastDto?> GetWeatherForecastAsync(Location location)
     {
-        var forecast = _weatherRepository.GetReportByLocation(RoundLocation(location));
+        var roundedLocation = LocationUtils.RoundLocation(location);
+        var forecast = _weatherRepository.GetReportByLocation(roundedLocation);
         if (forecast is null || !IsValid(forecast))
         {
-            await FetchWeatherForecastAsync(RoundLocation(location));
-            forecast = _weatherRepository.GetReportByLocation(RoundLocation(location));
+            await FetchWeatherForecastAsync(roundedLocation);
+            forecast = _weatherRepository.GetReportByLocation(roundedLocation);
         }
 
         return _mapper.Map<WeatherForecastDto>(forecast);
@@ -42,7 +43,7 @@ public class YRWeatherForecastService(
         {
             var response = serializer.Deserialize<YRResponse>(reader);
             var forecast = _mapper.Map<WeatherForecast>(response);
-            _weatherRepository.SaveForecast(RoundLocation(location), forecast);
+            _weatherRepository.SaveForecast(location, forecast);
         }
         catch (HttpRequestException e)
         {
@@ -59,28 +60,16 @@ public class YRWeatherForecastService(
 
     private string GetURL(Location location)
     {
-        var locationRounded = RoundLocation(location);
         // TODO: move string to configuration file
         string baseURL = "https://api.met.no/weatherapi/locationforecast/2.0/";
         if (location.Altitude is null)
         {
-            return baseURL + $"compact?lat={locationRounded.Latitude}&lon={locationRounded.Longitude}";
+            return baseURL + $"compact?lat={location.Latitude}&lon={location.Longitude}";
         }
         else
         {
-            return baseURL + $"compact?altitude={locationRounded.Altitude}&lat={locationRounded.Latitude}&lon={locationRounded.Longitude}";
+            return baseURL + $"compact?altitude={location.Altitude}&lat={location.Latitude}&lon={location.Longitude}";
         }
-    }
-
-    private static Location RoundLocation(Location location)
-    {
-        // this should ensure a precision of about 10km.
-        return new Location()
-        {
-            Longitude = Math.Round(location.Longitude, 1),
-            Latitude = Math.Round(location.Latitude, 1),
-            Altitude = location.Altitude is null ? null : Math.Round((double)location.Altitude, 1),
-        };
     }
 }
 
