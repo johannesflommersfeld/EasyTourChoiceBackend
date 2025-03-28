@@ -6,7 +6,7 @@ public interface ILocationRepository
 {
     Task<bool> LocationExistsAsync(int id);
     Task<Location?> GetLocationAsync(int id);
-    Task<int?> FindLocationAsync(Location location);
+    Task<int?> FindLocationIdAsync(Location location);
     Task AddLocationAsync(Location location);
     Task<bool> SaveChangesAsync();
 }

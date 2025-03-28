@@ -203,6 +203,22 @@ public class TourDataHandler(
             return result;
         }
 
+        tour.ActivityLocation = null;
+        tour.StartingLocation = null;
+        await _tourDataRepository.SaveChangesAsync();
+
+        if (tourToPatch.StartingLocation is not null)
+        {
+            tourToPatch.StartingLocationId = await _locationRepository.FindLocationIdAsync(_mapper.Map<Location>(tourToPatch.StartingLocation))
+                                             ?? await GetNewLocationIdAsync(_mapper.Map<Location>(tourToPatch.StartingLocation));
+        }
+        
+        if (tourToPatch.ActivityLocation is not null)
+        {
+            tourToPatch.ActivityLocationId = await _locationRepository.FindLocationIdAsync(_mapper.Map<Location>(tourToPatch.ActivityLocation))
+                                             ?? await GetNewLocationIdAsync(_mapper.Map<Location>(tourToPatch.ActivityLocation));       
+        }
+        
         _mapper.Map(tourToPatch, tour);
         await _tourDataRepository.SaveChangesAsync();
 
@@ -217,14 +233,14 @@ public class TourDataHandler(
     {
         if (tour.StartingLocation is not null)
         {
-            tour.StartingLocationId = await _locationRepository.FindLocationAsync(tour.StartingLocation)
+            tour.StartingLocationId = await _locationRepository.FindLocationIdAsync(tour.StartingLocation)
                                                ?? await GetNewLocationIdAsync(tour.StartingLocation);
             tour.StartingLocation = null;
         }
         
         if (tour.ActivityLocation is not null)
         {
-            tour.ActivityLocationId = await _locationRepository.FindLocationAsync(tour.ActivityLocation)
+            tour.ActivityLocationId = await _locationRepository.FindLocationIdAsync(tour.ActivityLocation)
                 ?? await GetNewLocationIdAsync(tour.ActivityLocation);
             tour.ActivityLocation = null;
         }
@@ -246,7 +262,7 @@ public class TourDataHandler(
         }
         await _locationRepository.AddLocationAsync(location);
         await _locationRepository.SaveChangesAsync();
-        return  await _locationRepository.FindLocationAsync(location) 
+        return  await _locationRepository.FindLocationIdAsync(location) 
             ?? throw new NullReferenceException("Location could not be added to database.");
     }
 }

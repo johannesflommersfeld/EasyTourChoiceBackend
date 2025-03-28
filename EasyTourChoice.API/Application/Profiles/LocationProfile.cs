@@ -11,7 +11,7 @@ public class LocationProfile : Profile
     {
         CreateMap<Location, LocationDto>();
         CreateMap<LocationForCreationDto, Location>();
-        CreateMap<LocationForUpdateDto, Location>();
+        CreateMap<LocationDto, Location>(); 
         CreateMap<Location, LocationForUpdateDto>();
     }
 }

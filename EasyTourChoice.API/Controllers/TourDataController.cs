@@ -158,24 +158,24 @@ public class TourDataController(
         if (!await _tourDataHandler.TourExistsAsync(tourID))
             return NotFound();
 
-        var tour = await _tourDataHandler.GetPlainTourByIDAsync(tourID);
-        if (tour == null)
+        var result = await _tourDataHandler.GetTourByIDAsync(tourID);
+        if (!result.IsSuccess)
             return NotFound();
 
-        var tourToPatch = _mapper.Map<TourDataForUpdateDto>(tour);
+        var tourToPatch = _mapper.Map<TourDataForUpdateDto>(result.TourData);
         patchDocument.ApplyTo(tourToPatch, ModelState);
 
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _tourDataHandler.UpdateTourAsync(tourID, tourToPatch);
-        string msg = string.Format("Tour {0} was updated", tourID);
+        var updateResult = await _tourDataHandler.UpdateTourAsync(tourID, tourToPatch);
+        string msg = $"Tour {tourID} was updated";
         _logger.LogInformation("{msg}", msg);
 
-        if (result.IsBadRequest)
-            return BadRequest(result.ModelState);
+        if (updateResult.IsBadRequest)
+            return BadRequest(updateResult.ModelState);
 
-        if (result.IsNotFound)
+        if (updateResult.IsNotFound)
             return NotFound();
 
         return NoContent();
