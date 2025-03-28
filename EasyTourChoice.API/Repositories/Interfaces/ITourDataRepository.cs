@@ -10,6 +10,7 @@ public interface ITourDataRepository
     Task<TourData?> GetTourByIdAsync(int id);
     Task<bool> TourDataExistsAsync(int id);
     Task AddTourAsync(TourData tourData);
+    void DeleteTour(TourData tourData);
     Task<bool> SaveChangesAsync();
 }
 

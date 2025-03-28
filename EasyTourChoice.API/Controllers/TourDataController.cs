@@ -148,17 +148,17 @@ public class TourDataController(
         return Created("GetTourData", tourDataForResponse);
     }
 
-    [HttpPatch("{tourID}")]
+    [HttpPatch("{tourId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> UpdateTourData(int tourID,
+    public async Task<ActionResult> UpdateTourData(int tourId,
            JsonPatchDocument<TourDataForUpdateDto> patchDocument)
     {
-        if (!await _tourDataHandler.TourExistsAsync(tourID))
+        if (!await _tourDataHandler.TourExistsAsync(tourId))
             return NotFound();
 
-        var result = await _tourDataHandler.GetTourByIDAsync(tourID);
+        var result = await _tourDataHandler.GetTourByIDAsync(tourId);
         if (!result.IsSuccess)
             return NotFound();
 
@@ -168,8 +168,8 @@ public class TourDataController(
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var updateResult = await _tourDataHandler.UpdateTourAsync(tourID, tourToPatch);
-        string msg = $"Tour {tourID} was updated";
+        var updateResult = await _tourDataHandler.UpdateTourAsync(tourId, tourToPatch);
+        string msg = $"Tour {tourId} was updated";
         _logger.LogInformation("{msg}", msg);
 
         if (updateResult.IsBadRequest)
@@ -183,4 +183,13 @@ public class TourDataController(
 
     // TODO: add delete functionality. Areas and locations should automatically be deleted 
     // if they are no longer referenced by any tour
+    [HttpDelete("{tourId}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteTourData(int tourId)
+    {
+        var deleteResult = await _tourDataHandler.DeleteTourAsync(tourId);
+        if (deleteResult.IsNotFound)
+            return NotFound();
+        return Ok();
+    }
 }

@@ -8,6 +8,7 @@ public interface ITourDataHandler
 {
     Task CreateTourAsync(TourData tour);
     Task<TourDataResult> UpdateTourAsync(int tourId, TourDataForUpdateDto tourToPatch);
+    Task<TourDataResult> DeleteTourAsync(int tourId);
     Task<TourDataDto?> GetPlainTourByIDAsync(int tourId);
     Task<TourDataResult> GetTourByIDAsync(int tourId);
     Task<TravelInfoResult> GetTravelInfoAsync(int tourId, Location userLocation, ITravelPlanningService travelService);

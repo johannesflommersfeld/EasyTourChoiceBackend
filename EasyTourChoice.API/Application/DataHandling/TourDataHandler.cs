@@ -229,6 +229,22 @@ public class TourDataHandler(
         return result;
     }
 
+    public async Task<TourDataResult> DeleteTourAsync(int tourId)
+    {
+        var result = new TourDataResult();
+        var tour  = await _tourDataRepository.GetTourByIdAsync(tourId);
+        if (tour is null)
+        {
+            result.IsNotFound = true;
+            return result;
+        }
+        
+        _tourDataRepository.DeleteTour(tour);
+        result.IsSuccess = await _tourDataRepository.SaveChangesAsync();
+        return result;
+    }
+
+
     public async Task CreateTourAsync(TourData tour)
     {
         if (tour.StartingLocation is not null)

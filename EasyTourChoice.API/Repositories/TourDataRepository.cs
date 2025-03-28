@@ -33,6 +33,11 @@ public class TourDataRepository(TourDataContext context) : ITourDataRepository
     {
         await _context.Tours.AddAsync(tourData);
     }
+    
+    public void DeleteTour(TourData tourData)
+    {
+        _context.Tours.Remove(tourData);
+    }
 
     public async Task<bool> SaveChangesAsync()
     {
