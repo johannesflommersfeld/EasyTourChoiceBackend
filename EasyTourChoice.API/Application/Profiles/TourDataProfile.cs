@@ -10,6 +10,6 @@ public class TourDataProfile : Profile
         CreateMap<TourData, TourDataDto>();
         CreateMap<TourDataForCreationDto, TourData>();
         CreateMap<TourDataForUpdateDto, TourData>();
-        CreateMap<TourData, TourDataForUpdateDto>();
+        CreateMap<TourDataDto, TourDataForUpdateDto>();
     }
 }

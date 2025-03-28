@@ -9,7 +9,9 @@ public class LocationBase : IEquatable<object>
 
     [property: JsonPropertyName("longitude")]
     public double Longitude { get; set; } // longitude with decimal minutes
-    public double? Altitude { get; set; } // altitude in meter
+    
+    [property: JsonPropertyName("altitude")]
+    public double? Altitude { get; set; } // altitude in meters
 
     // according to https://en.wikipedia.org/wiki/Decimal_degrees,
     // this should be precise enough for our purposes (+/- 10 m)
