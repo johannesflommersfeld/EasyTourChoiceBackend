@@ -25,7 +25,21 @@ public class TravelInformationRepository(TourDataContext context): ITravelInform
     
     public async Task<bool> SaveTravelInformationAsync(TravelInformation travelInformation)
     {
-        await _context.TravelInformations.AddAsync(travelInformation);
+        if (travelInformation.TargetLocationId is null || travelInformation.StartingLocation is null)
+        {
+            return false;
+        }
+        var existingInfo = await GetTravelInformationAsync(travelInformation.StartingLocation, (int)travelInformation.TargetLocationId);
+        if (existingInfo is null)
+        {
+            await _context.TravelInformations.AddAsync(travelInformation);
+        }
+        else
+        {
+            existingInfo.TravelDistance = travelInformation.TravelDistance;
+            existingInfo.TravelTime = travelInformation.TravelTime;
+            existingInfo.Route = travelInformation.Route;
+        }
         return await _context.SaveChangesAsync() >= 0;
     }
 }

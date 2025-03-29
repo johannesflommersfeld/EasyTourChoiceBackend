@@ -103,8 +103,8 @@ public class TourDataController(
     {
         var userLocation = new Location()
         {
-            Latitude = (double)userLatitude,
-            Longitude = (double)userLongitude,
+            Latitude = userLatitude,
+            Longitude = userLongitude,
         };
 
         var response = await _tourDataHandler.GetTravelInfoAsync(tourID, userLocation, travelService);

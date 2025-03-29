@@ -30,7 +30,11 @@ public class TravelPlanningServiceOsrm(
         }
         
         var travelInfos = httpOnly ? null : await _travelInfoRepository.GetTravelInformationAsync(currentLocation, (int)targetLocation.LocationId);
-        if (travelInfos is null)
+        if (travelInfos is null 
+            || Math.Abs(travelInfos.TravelTime) < float.Epsilon 
+            || Math.Abs(travelInfos.TravelDistance) < float.Epsilon 
+            || travelInfos.Route is null 
+            || travelInfos.Route.Count == 0)
         {
             await using Stream stream =
                 await _httpService.PerformGetRequestAsync(GetUrl(currentLocation, targetLocation, false));
@@ -84,7 +88,11 @@ public class TravelPlanningServiceOsrm(
         }
         
         var travelInfos = await _travelInfoRepository.GetTravelInformationAsync(currentLocation, (int)targetLocation.LocationId);
-        if (travelInfos is null)
+        if (travelInfos is null 
+            || Math.Abs(travelInfos.TravelTime) < float.Epsilon 
+            || Math.Abs(travelInfos.TravelDistance) < float.Epsilon 
+            || travelInfos.Route is null 
+            || travelInfos.Route.Count == 0)
         {
             await using Stream stream =
                 await _httpService.PerformGetRequestAsync(GetUrl(currentLocation, targetLocation, true));
