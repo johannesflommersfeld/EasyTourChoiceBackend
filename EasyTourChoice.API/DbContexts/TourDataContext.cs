@@ -17,9 +17,8 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
     public DbSet<AvalancheProblem> AvalancheProblems { get; set; }
     public DbSet<AvalancheRegion> AvalancheRegions { get; set; }
     public DbSet<WeatherForecast> WeatherForecasts { get; set; }
-
-    // TODO add travel information
-
+    public DbSet<TravelInformation> TravelInformations { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // configure Locations
@@ -209,7 +208,7 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 );
             });
 
-        // Serialize the timeseries as JSON since it's complex and we don't need to query it
+        // Serialize the timeseries as JSON since it's complex, and we don't need to query it
         var timeseriesConverter = new ValueConverter<List<ForecastTimeStep>, string>(
             v => JsonSerializer.Serialize(v, new JsonSerializerOptions { WriteIndented = true }),
             v => JsonSerializer.Deserialize<List<ForecastTimeStep>>(v, new JsonSerializerOptions { WriteIndented = true })
@@ -226,6 +225,15 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(w => w.LocationId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // configure TravelInformation
+        modelBuilder.Entity<TravelInformation>()
+            .Property(e => e.TravelInfoId)
+            .ValueGeneratedOnAdd();
+        
+        modelBuilder.Entity<TravelInformation>()
+            .Property(e => e.Route)
+            .HasConversion(trackConverter);
+        
         base.OnModelCreating(modelBuilder);
     }
 
@@ -404,26 +412,31 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
 
     public async Task CleanupExpiredAvalancheReportsAsync()
     {
-        //TODO clean up ReportRatings and ReportProblems
-        // Delete all expired avalanche reports
-        var expiredReports = AvalancheReports
+        var expiredReports = await AvalancheReports
             .Where(ar => ar.EndTime < DateTime.Now)
-            .ToList();
+            .ToListAsync();
         AvalancheReports.RemoveRange(expiredReports);
         await SaveChangesAsync();
 
         // Delete all avalanche problems and danger ratings that are no longer referenced
-        var unreferencedProblems = AvalancheProblems
+        var unreferencedProblems = await AvalancheProblems
             .Where(p => !p.AvalancheReports.Any())
-            .ToList();
+            .ToListAsync();
 
-        var unreferencedRatings = DangerRatings
+        var unreferencedRatings = await DangerRatings
             .Where(r => !r.AvalancheReports.Any())
-            .ToList();
+            .ToListAsync();
 
         AvalancheProblems.RemoveRange(unreferencedProblems);
         DangerRatings.RemoveRange(unreferencedRatings);
 
+        await SaveChangesAsync();
+    }
+    
+    public async Task DropTravelDetails()
+    {
+        var travelDetails = await TravelInformations.ToListAsync();
+        TravelInformations.RemoveRange(travelDetails);
         await SaveChangesAsync();
     }
 }

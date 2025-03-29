@@ -8,12 +8,12 @@ public class AvalancheReportsRepository(TourDataContext context) : IAvalancheRep
 {
     private readonly TourDataContext _context = context ?? throw new ArgumentNullException(nameof(context));
 
-    public async Task<IEnumerable<AvalancheReport>> GetAllReports()
+    public async Task<IEnumerable<AvalancheReport>> GetAllReportsAsync()
     {
         return await _context.AvalancheReports.ToListAsync();
     }
 
-    public async Task<AvalancheReport?> GetReportByRegionID(string regionId)
+    public async Task<AvalancheReport?> GetReportByRegionIdAsync(string regionId)
     {
         return await _context.AvalancheReports
             .AsNoTracking()
@@ -22,7 +22,7 @@ public class AvalancheReportsRepository(TourDataContext context) : IAvalancheRep
             .SingleOrDefaultAsync(r => r.RegionId == regionId);
     }
 
-    public async Task SaveReport(AvalancheReport report)
+    public async Task SaveReportAsync(AvalancheReport report)
     {
         foreach (var dangerRating in report.DangerRatings)
         {

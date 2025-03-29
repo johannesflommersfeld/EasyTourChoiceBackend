@@ -18,7 +18,7 @@ public class TourData : TourBase
     [Location]
     [ForeignKey("ActivityLocationId")]
     public Location? ActivityLocation { get; set; }
-
+    
     [ForeignKey("AreaId")]
     public Area? Area { get; set; }
 }

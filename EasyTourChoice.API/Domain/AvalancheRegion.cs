@@ -8,6 +8,6 @@ public record AvalancheRegion
 {
     [Key]
     public required string Id { get; init; }
-    public required GeometryType Type { get; init; }
-    public required ICollection<ICollection<ICollection<double>>> Polygons { get; init; }
+    public required GeometryType Type { get; set; }
+    public required ICollection<ICollection<ICollection<double>>> Polygons { get; set; }
 }

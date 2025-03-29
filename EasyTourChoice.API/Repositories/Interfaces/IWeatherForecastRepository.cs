@@ -4,8 +4,8 @@ namespace EasyTourChoice.API.Repositories.Interfaces;
 
 public interface IWeatherForecastRepository
 {
-    List<WeatherForecast> GetAllReports();
-    WeatherForecast? GetReportByLocation(Location location);
-    void SaveForecast(Location location, WeatherForecast forecast);
-    void RemoveOutdatedForecasts(TimeSpan maxAge);
+    Task<List<WeatherForecast>> GetAllReportsAsync();
+    Task<WeatherForecast?> GetReportByLocationAsync(Location location);
+    Task<bool> SaveForecastAsync(Location location, WeatherForecast forecast);
+    Task RemoveOutdatedForecastsAsync(TimeSpan maxAge);
 }

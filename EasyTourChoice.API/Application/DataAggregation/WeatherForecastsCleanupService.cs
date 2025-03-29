@@ -34,7 +34,7 @@ public class WeatherForecastsCleanupService(
                 using var scope = _scopeFactory.CreateScope();
                 var weatherForecastRepository = scope.ServiceProvider.GetRequiredService<IWeatherForecastRepository>();
                 // Set the max age to 1 hour for weather forecasts
-                weatherForecastRepository.RemoveOutdatedForecasts(TimeSpan.FromHours(1));
+                await weatherForecastRepository.RemoveOutdatedForecastsAsync(TimeSpan.FromHours(1));
             }
             catch (Exception ex)
             {

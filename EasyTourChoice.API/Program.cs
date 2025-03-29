@@ -16,9 +16,10 @@ builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddScoped<IAvalancheReportService, EAWSReportService>();
 builder.Services.AddHostedService<WeatherForecastsCleanupService>();
 builder.Services.AddHostedService<AvalancheReportCleanupService>();
+builder.Services.AddHostedService<TravelDetailsCleanupService>();
 builder.Services.AddScoped<IWeatherForecastService, YRWeatherForecastService>();
 // TODO: replace key strings by enums
-builder.Services.AddKeyedScoped<ITravelPlanningService, TravelPlanningServiceOSRM>("OSRM");
+builder.Services.AddKeyedScoped<ITravelPlanningService, TravelPlanningServiceOsrm>("OSRM");
 builder.Services.AddKeyedScoped<ITravelPlanningService, TravelPlanningServiceTomTom>("TomTom");
 builder.Services.AddScoped<IAvalancheRegionService, EawsRegionService>();
 builder.Services.AddScoped<IAreaRepository, AreaRepository>();
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IAvalancheReportsRepository, AvalancheReportsReposito
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<ITourDataRepository, TourDataRepository>();
 builder.Services.AddScoped<IWeatherForecastRepository, WeatherForecastRepository>();
+builder.Services.AddScoped<ITravelInformationRepository, TravelInformationRepository>();
 builder.Services.AddScoped<IAreaHandler, AreaHandler>();
 builder.Services.AddScoped<ILocationHandler, LocationHandler>();
 builder.Services.AddScoped<ITourDataHandler, TourDataHandler>();

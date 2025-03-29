@@ -22,11 +22,11 @@ public class YRWeatherForecastService(
     public async Task<WeatherForecastDto?> GetWeatherForecastAsync(Location location)
     {
         var roundedLocation = LocationUtils.RoundLocation(location);
-        var forecast = _weatherRepository.GetReportByLocation(roundedLocation);
+        var forecast = await _weatherRepository.GetReportByLocationAsync(roundedLocation);
         if (forecast is null || !IsValid(forecast))
         {
             await FetchWeatherForecastAsync(roundedLocation);
-            forecast = _weatherRepository.GetReportByLocation(roundedLocation);
+            forecast = await _weatherRepository.GetReportByLocationAsync(roundedLocation);
         }
 
         return _mapper.Map<WeatherForecastDto>(forecast);
@@ -43,7 +43,10 @@ public class YRWeatherForecastService(
         {
             var response = serializer.Deserialize<YRResponse>(reader);
             var forecast = _mapper.Map<WeatherForecast>(response);
-            _weatherRepository.SaveForecast(location, forecast);
+            if(!await _weatherRepository.SaveForecastAsync(location, forecast))
+            {
+                _logger.LogError("Failed to save weather forecast in the database.");
+            }
         }
         catch (HttpRequestException e)
         {

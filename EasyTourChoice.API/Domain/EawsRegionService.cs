@@ -32,11 +32,11 @@ public class EawsRegionService : IAvalancheRegionService
 
     public async Task<string?> GetRegionIDAsync(LocationBase location)
     {
-        var regions = _avalancheRegionsRepository.GetAllRegions();
+        var regions = await _avalancheRegionsRepository.GetAllRegionsAsync();
         if (regions.Count == 0)
         {
             await LoadRegionsAsync();
-            regions = _avalancheRegionsRepository.GetAllRegions();
+            regions = await _avalancheRegionsRepository.GetAllRegionsAsync();
         }
 
         var regionId = SearchInRegions(location, regions);
@@ -44,7 +44,7 @@ public class EawsRegionService : IAvalancheRegionService
 
         // check if new regions were added.
         await LoadRegionsAsync();
-        regions = _avalancheRegionsRepository.GetAllRegions();
+        regions = await _avalancheRegionsRepository.GetAllRegionsAsync();
         return SearchInRegions(location, regions);
     }
 
@@ -77,16 +77,19 @@ public class EawsRegionService : IAvalancheRegionService
             var serializer = new JsonSerializer();
             var eawsRegions = serializer.Deserialize<EAWSRegionsDto>(reader)
                 ?? throw new NullReferenceException("Failed to load EAWS regions.");
+            
+            var listOfTasks = new List<Task>();
             foreach (var feature in eawsRegions.Features)
             {
-                _avalancheRegionsRepository.SaveRegion(
+                listOfTasks.Add(_avalancheRegionsRepository.SaveRegionAsync(
                     new AvalancheRegion()
                     {
                         Id = feature.Properties.Id,
                         Type = feature.Geometry.Type,
                         Polygons = feature.Geometry.Coordinates.First(),
-                    });
+                    }));
             }
+            await Task.WhenAll(listOfTasks);
         }
         catch (HttpRequestException e)
         {

@@ -4,7 +4,7 @@ namespace EasyTourChoice.API.Repositories.Interfaces;
 
 public interface IAvalancheRegionsRepository
 {
-    List<AvalancheRegion> GetAllRegions();
-    AvalancheRegion? GetRegionById(string id);
-    void SaveRegion(AvalancheRegion region);
+    Task<List<AvalancheRegion>> GetAllRegionsAsync();
+    Task<AvalancheRegion?> GetRegionByIdAsync(string id);
+    Task SaveRegionAsync(AvalancheRegion region);
 }

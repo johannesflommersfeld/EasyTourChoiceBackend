@@ -1,36 +1,37 @@
 using EasyTourChoice.API.DbContexts;
 using EasyTourChoice.API.Domain;
 using EasyTourChoice.API.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace EasyTourChoice.API.Repositories;
 public class AvalancheRegionsRepository(TourDataContext context) : IAvalancheRegionsRepository
 {
     private readonly TourDataContext _context = context ?? throw new ArgumentNullException(nameof(context));
 
-    public List<AvalancheRegion> GetAllRegions()
+    public async Task<List<AvalancheRegion>> GetAllRegionsAsync()
     {
-        return _context.AvalancheRegions.ToList();
+        return await _context.AvalancheRegions.ToListAsync();
     }
 
-    public AvalancheRegion? GetRegionById(string id)
+    public async Task<AvalancheRegion?> GetRegionByIdAsync(string id)
     {
-        return _context.AvalancheRegions.FirstOrDefault(r => r.Id == id);
+        return await _context.AvalancheRegions.FirstOrDefaultAsync(r => r.Id == id);
     }
 
-    public void SaveRegion(AvalancheRegion region)
+    public async Task SaveRegionAsync(AvalancheRegion region)
     {
-        var existingRegion = _context.AvalancheRegions.FirstOrDefault(r => r.Id == region.Id);
+        var existingRegion = await _context.AvalancheRegions.FirstOrDefaultAsync(r => r.Id == region.Id);
 
         if (existingRegion is null)
         {
-            // Add new region
-            _context.AvalancheRegions.Add(region);
+            await _context.AvalancheRegions.AddAsync(region);
         }
         else
         {
-            _context.Entry(existingRegion).CurrentValues.SetValues(region);
+            existingRegion.Polygons = region.Polygons;
+            existingRegion.Type = region.Type;
         }
 
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 }

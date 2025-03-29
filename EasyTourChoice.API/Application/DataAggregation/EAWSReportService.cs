@@ -25,11 +25,11 @@ public class EAWSReportService(
     public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID)
 #endif
     {
-        var report = await _reportsRepository.GetReportByRegionID(regionId);
+        var report = await _reportsRepository.GetReportByRegionIdAsync(regionId);
         if (report is null || !report.IsValid())
         {
             await FetchLatestAvalancheReportAsync();
-            report = await _reportsRepository.GetReportByRegionID(regionId);
+            report = await _reportsRepository.GetReportByRegionIdAsync(regionId);
         }
 
         if (report is null)
@@ -69,7 +69,7 @@ public class EAWSReportService(
                     var report = _mapper.Map<AvalancheReport>(bulletin);
                     report.RegionId = region.RegionID;
                     report.RegionName = region.Name;
-                    saveTasks.Add(_reportsRepository.SaveReport(report));
+                    saveTasks.Add(_reportsRepository.SaveReportAsync(report));
                 }
             }
             await Task.WhenAll(saveTasks);
