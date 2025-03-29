@@ -10,6 +10,7 @@ namespace EasyTourChoice.API.Application.DataHandling;
 public class TourDataHandler(
     ITourDataRepository tourDataRepository,
     ILocationRepository locationRepository,
+    [FromKeyedServices("OSRM")] ITravelPlanningService travelDetailsService,
     IAreaRepository areaRepository,
     IMapper mapper,
     ILogger<TourDataHandler> logger,
@@ -25,28 +26,41 @@ public class TourDataHandler(
     private readonly IAvalancheRegionService _regionService = regionService;
     private readonly IAvalancheReportService _reportService = reportService;
     private readonly IWeatherForecastService _weatherForecastService = weatherForecastService;
+    private readonly ITravelPlanningService _travelDetailsService = travelDetailsService;
     private readonly IMapper _mapper = mapper;
     private readonly ILogger<TourDataHandler> _logger = logger;
-    public async Task<List<TourDataDto>> GetAllToursAsync(ITravelPlanningService travelService)
+    
+    public async Task<List<TourDataDto>> GetAllToursAsync(Location? userLocation, ITravelPlanningService travelService)
     {
         var tourData = await _tourDataRepository.GetAllToursAsync();
         var result = _mapper.Map<List<TourDataDto>>(tourData);
-        foreach (var tour in result)
+        
+        // first get all cached travel details to avoid concurrent database calls
+        foreach (var tourDto in result)
         {
-            if (tour.ActivityLocationId is not null)
+            if (tourDto.StartingLocationId is not null && userLocation is not null)
             {
-                var location = await _locationRepository.GetLocationAsync((int)tour.ActivityLocationId);
-                tour.ActivityLocation = _mapper.Map<LocationDto>(location);
-            }
-
-            if (tour.StartingLocationId is not null)
-            {
-                var location = await _locationRepository.GetLocationAsync((int)tour.StartingLocationId);
-                tour.StartingLocation = _mapper.Map<LocationDto>(location);
+                tourDto.TravelDetails = await _travelDetailsService.GetCachedTravelInfoAsync(userLocation,
+                    _mapper.Map<Location>(tourDto.StartingLocation));
             }
         }
-
-        // TODO: only include travel time and distance
+        
+        List<Task> tasks = [];
+        foreach (var tourDto in result)
+        {
+            // perform concurrent http requests for the missing travel details
+            if (tourDto.TravelDetails is not null && tourDto.StartingLocationId is not null && userLocation is not null)
+            {
+                tasks.Add(Task.Run(async () =>
+                {
+                    var travelInfos = await _travelDetailsService.GetShortTravelInfoAsync(userLocation,
+                        _mapper.Map<Location>(tourDto.StartingLocation), true);
+                    tourDto.TravelDetails = _mapper.Map<TravelInformationDto>(travelInfos);
+                }));
+            }
+        }
+        await Task.WhenAll(tasks);
+        
         return result;
     }
 
@@ -82,19 +96,6 @@ public class TourDataHandler(
         }
 
         result.TourData = _mapper.Map<TourDataDto>(tourData);
-
-        if (tourData.ActivityLocationId is not null)
-        {
-            var location = await _locationRepository.GetLocationAsync((int)tourData.ActivityLocationId);
-            result.TourData.ActivityLocation = _mapper.Map<LocationDto>(location);
-        }
-
-        if (tourData.StartingLocationId is not null)
-        {
-            var location = await _locationRepository.GetLocationAsync((int)tourData.StartingLocationId);
-            result.TourData.StartingLocation = _mapper.Map<LocationDto>(location);
-        }
-
         result.IsSuccess = true;
 
         return result;
@@ -104,20 +105,13 @@ public class TourDataHandler(
     {
         var result = new WeatherForecastResult();
         var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
-        if (tourData?.StartingLocationId is null)
+        if (tourData?.StartingLocation is null)
         {
             result.IsNotFound = true;
             return result;
         }
 
-        var targetLocation = await _locationRepository.GetLocationAsync((int)tourData.StartingLocationId);
-        if (targetLocation is null)
-        {
-            result.IsNotFound = true;
-            return result;
-        }
-
-        result.WeatherForecast = await _weatherForecastService.GetWeatherForecastAsync(targetLocation);
+        result.WeatherForecast = await _weatherForecastService.GetWeatherForecastAsync(tourData.StartingLocation);
 
         result.IsSuccess = true;
         return result;
@@ -127,20 +121,13 @@ public class TourDataHandler(
     {
         var result = new TravelInfoResult();
         var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
-        if (tourData?.StartingLocationId is null)
+        if (tourData?.StartingLocation is null)
         {
             result.IsNotFound = true;
             return result;
         }
 
-        var targetLocation = await _locationRepository.GetLocationAsync((int)tourData.StartingLocationId);
-        if (targetLocation is null)
-        {
-            result.IsNotFound = true;
-            return result;
-        }
-
-        result.TravelInformation = await travelService.GetLongTravelInfoAsync(userLocation, targetLocation);
+        result.TravelInformation = await travelService.GetLongTravelInfoAsync(userLocation, tourData.StartingLocation);
         result.IsSuccess = true;
         return result;
     }
@@ -149,20 +136,13 @@ public class TourDataHandler(
     {
         var result = new BulletinResult();
         var tourData = await _tourDataRepository.GetTourByIdAsync(tourId);
-        if (tourData?.StartingLocationId is null)
+        if (tourData?.StartingLocation is null)
         {
             result.IsNotFound = true;
             return result;
         }
 
-        var targetLocation = await _locationRepository.GetLocationAsync((int)tourData.StartingLocationId);
-        if (targetLocation is null)
-        {
-            result.IsNotFound = true;
-            return result;
-        }
-
-        var regionId = tourData.AvalancheRegionId ?? await _regionService.GetRegionIDAsync(targetLocation);
+        var regionId = tourData.AvalancheRegionId ?? await _regionService.GetRegionIDAsync(tourData.StartingLocation);
         if (regionId is null)
         {
             result.IsNotFound = true;

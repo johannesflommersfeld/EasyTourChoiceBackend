@@ -11,7 +11,10 @@ public class TourDataRepository(TourDataContext context) : ITourDataRepository
 
     public async Task<IEnumerable<TourData>> GetAllToursAsync()
     {
-        return await _context.Tours.ToListAsync();
+        return await _context.Tours
+            .Include(t => t.StartingLocation)
+            .Include(t => t.ActivityLocation)
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<TourData>> GetToursByActivityAsync(Activity activity)
@@ -26,7 +29,11 @@ public class TourDataRepository(TourDataContext context) : ITourDataRepository
 
     public async Task<TourData?> GetTourByIdAsync(int id)
     {
-        return await _context.Tours.Where(t => t.Id == id).FirstOrDefaultAsync();
+        return await _context.Tours
+            .Include(t => t.StartingLocation)
+            .Include(t => t.ActivityLocation)
+            .Where(t => t.Id == id)
+            .FirstOrDefaultAsync();
     }
 
     public async Task AddTourAsync(TourData tourData)

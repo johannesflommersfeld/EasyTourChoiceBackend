@@ -25,9 +25,16 @@ public class TourDataController(
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<TourDataDto>>> GetAllTourData(
-        [FromKeyedServices("OSRM")] ITravelPlanningService travelService)
+        [FromKeyedServices("OSRM")] ITravelPlanningService travelService, double? userLatitude, double? userLongitude)
     {
-        var tours = await _tourDataHandler.GetAllToursAsync(travelService);
+        Location? userLocation = null;
+        if (userLatitude is not null && userLongitude is not null)
+        {
+            userLocation = new Location();
+            userLocation.Latitude = (double)userLatitude;
+            userLocation.Longitude = (double)userLongitude;
+        }
+        var tours = await _tourDataHandler.GetAllToursAsync(userLocation, travelService);
         return Ok(tours);
     }
 

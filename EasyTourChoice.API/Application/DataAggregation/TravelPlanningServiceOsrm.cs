@@ -21,14 +21,15 @@ public class TravelPlanningServiceOsrm(
     private readonly IMapper _mapper = mapper;
 
 
-    public async Task<TravelInformationDto?> GetShortTravelInfoAsync(Location currentLocation, Location targetLocation)
+    public async Task<TravelInformationDto?> GetShortTravelInfoAsync(Location currentLocation, Location targetLocation,
+        bool httpOnly=false)
     {
         if (targetLocation.LocationId is null)
         {
             return null;
         }
         
-        var travelInfos = await _travelInfoRepository.GetTravelInformationAsync(currentLocation, (int)targetLocation.LocationId);
+        var travelInfos = httpOnly ? null : await _travelInfoRepository.GetTravelInformationAsync(currentLocation, (int)targetLocation.LocationId);
         if (travelInfos is null)
         {
             await using Stream stream =
@@ -48,7 +49,7 @@ public class TravelPlanningServiceOsrm(
                 travelInfos.TravelDistance = response?.Routes[0].Legs[0].Distance / 1_000 ?? 0;
                 // convert to hours
                 travelInfos.TravelTime = response?.Routes[0].Legs[0].Duration / 3_600 ?? 0;
-                if(!await _travelInfoRepository.SaveTravelInformationAsync(travelInfos))
+                if(!httpOnly && !await _travelInfoRepository.SaveTravelInformationAsync(travelInfos))
                 {
                     _logger.LogError("Failed to save travel information in the database.");
                 }
@@ -63,6 +64,18 @@ public class TravelPlanningServiceOsrm(
         return _mapper.Map<TravelInformationDto>(travelInfos);
     }
 
+    public async Task<TravelInformationDto?> GetCachedTravelInfoAsync(Location currentLocation, Location targetLocation)
+    {
+        if (targetLocation.LocationId is null)
+        {
+            return null;
+        }
+        
+        var travelInfos = await _travelInfoRepository.GetTravelInformationAsync(currentLocation, (int)targetLocation.LocationId);
+        return _mapper.Map<TravelInformationDto>(travelInfos);
+    }
+
+    
     public async Task<TravelInformationWithRouteDto?> GetLongTravelInfoAsync(Location currentLocation, Location targetLocation)
     {
         if (targetLocation.LocationId is null)

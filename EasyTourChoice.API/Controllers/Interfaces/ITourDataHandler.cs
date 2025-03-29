@@ -17,7 +17,7 @@ public interface ITourDataHandler
 
     Task<bool> TourExistsAsync(int tourId);
     // TODO: allow for filtering and sorting
-    Task<List<TourDataDto>> GetAllToursAsync(ITravelPlanningService travelService);
+    Task<List<TourDataDto>> GetAllToursAsync(Location? userLocation, ITravelPlanningService travelService);
     Task<List<TourDataDto>> GetAllToursByActvityAsync(Activity activity);
     Task<List<TourDataDto>> GetAllToursByAreaAsync(int areaId);
 }

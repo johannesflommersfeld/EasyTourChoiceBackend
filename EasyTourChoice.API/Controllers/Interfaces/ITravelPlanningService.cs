@@ -5,6 +5,7 @@ namespace EasyTourChoice.API.Controllers.Interfaces;
 
 public interface ITravelPlanningService
 {
-    Task<TravelInformationDto?> GetShortTravelInfoAsync(Location currentLocation, Location targetLocation);
+    Task<TravelInformationDto?> GetShortTravelInfoAsync(Location currentLocation, Location targetLocation, bool travelInfoOnly = false);
+    Task<TravelInformationDto?> GetCachedTravelInfoAsync(Location currentLocation, Location targetLocation);
     Task<TravelInformationWithRouteDto?> GetLongTravelInfoAsync(Location currentLocation, Location targetLocation);
 }

@@ -6,7 +6,12 @@ namespace EasyTourChoice.API.Application.DataAggregation;
 
 public class TravelPlanningServiceTomTom : ITravelPlanningService
 {
-    public Task<TravelInformationDto?> GetShortTravelInfoAsync(Location currentLocation, Location targetLocation)
+    public Task<TravelInformationDto?> GetShortTravelInfoAsync(Location currentLocation, Location targetLocation, bool httpOnly = false)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public Task<TravelInformationDto?> GetCachedTravelInfoAsync(Location currentLocation, Location targetLocation)
     {
         throw new NotImplementedException();
     }
