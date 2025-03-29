@@ -54,6 +54,14 @@ public class TourDataContext(DbContextOptions options) : DbContext(options)
                 v => v.ToString(),
                 v => v == null ? null : Enum.Parse<RiskLevel>(v)
             );
+        
+        var trackConverter = new ValueConverter<List<Location>?, string>(
+            v => JsonSerializer.Serialize(v, new JsonSerializerOptions { WriteIndented = true }),
+            v => JsonSerializer.Deserialize<List<Location>>(v, new JsonSerializerOptions { WriteIndented = true })
+        );
+        modelBuilder.Entity<TourData>()
+            .Property(e => e.Track)
+            .HasConversion(trackConverter);
 
         // configure AvalancheReport
         modelBuilder.Entity<AvalancheReport>()

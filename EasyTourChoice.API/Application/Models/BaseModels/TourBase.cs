@@ -37,4 +37,6 @@ public class TourBase
     public int? AreaId { get; set; }
 
     public string? AvalancheRegionId { get; set; }
+
+    public List<Location>? Track { get; set; }
 }

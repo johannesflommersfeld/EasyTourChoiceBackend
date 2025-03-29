@@ -46,8 +46,6 @@ builder.Services.AddSwaggerGen();
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-Console.WriteLine($"Connection string: {builder.Configuration["ETC_CONNECTIONSTRING"]}");
-
 builder.Services.AddDbContext<TourDataContext>(dbContextOptions =>
     dbContextOptions.UseSqlite(builder.Configuration["ETC_CONNECTIONSTRING"]));
 
