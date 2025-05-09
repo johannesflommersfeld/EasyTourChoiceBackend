@@ -22,7 +22,7 @@ public class EAWSReportService(
 #if DEBUG
     public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionId, bool mustBeValid = true)
 #else
-    public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionID)
+    public async Task<AvalancheReportDto?> GetAvalancheReportAsync(string regionId)
 #endif
     {
         var report = await _reportsRepository.GetReportByRegionIdAsync(regionId);
@@ -34,9 +34,14 @@ public class EAWSReportService(
 
         if (report is null)
             return null;
-
+        
+#if DEBUG
         if (mustBeValid && !report.IsValid())
             return null;
+#else
+        if (!report.IsValid())
+            return null;
+#endif
 
         return _mapper.Map<AvalancheReportDto>(report);
     }

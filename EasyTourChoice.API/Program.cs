@@ -6,6 +6,7 @@ using EasyTourChoice.API.DbContexts;
 using EasyTourChoice.API.Domain;
 using EasyTourChoice.API.Repositories;
 using EasyTourChoice.API.Repositories.Interfaces;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,8 +66,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
 
-app.UseHttpsRedirection();
+app.UseForwardedHeaders(new ForwardedHeadersOptions {
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseAuthorization();
 
