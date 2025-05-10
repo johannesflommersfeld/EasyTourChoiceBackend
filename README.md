@@ -1,5 +1,5 @@
 # Easy Route Choice API
-This is the backend of the easy route choice web application (todo: link).
+This is the backend of the easy route choice web application (see https://github.com/johannesflommersfeld/EasyTourChoiceFrontend for the frontend).
 
 ## Features
 TBD
