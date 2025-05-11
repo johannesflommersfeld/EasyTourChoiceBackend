@@ -1,9 +1,9 @@
 # Stage 1: Build
-FROM --platform=linux/arm64 mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 COPY . .
 WORKDIR /app/EasyTourChoice.API
-RUN dotnet publish -c Release -o /app/publish -r linux-arm -p:PublishReadyToRun=true
+RUN dotnet publish -c Release -o /app/publish -p:PublishReadyToRun=true --self-contained false
 
 # Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
