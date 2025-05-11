@@ -4,6 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <VersionSuffix>dev</VersionSuffix>
+    <AssemblyName>EasyTourChoice.API</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

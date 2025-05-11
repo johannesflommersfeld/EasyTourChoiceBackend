@@ -4,3 +4,4 @@
 .vs*
 [Mm]igrations/
 .idea*
+*.user
