@@ -12,7 +12,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm64
 
     steps:
     - uses: actions/checkout@v4
@@ -50,7 +50,6 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build Docker image
       run: |
-        docker run --rm --privileged tonistiigi/binfmt --install all
         docker buildx build --platform linux/arm64 --load \
           -f ./EasyTourChoice.API/easy-tour-choice.api.dockerfile \
           -t ${{ secrets.DOCKER_USERNAME }}/easy-tour-choice-backend:${{ env.VERSION }} \
