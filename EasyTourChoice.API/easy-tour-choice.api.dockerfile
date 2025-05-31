@@ -17,4 +17,4 @@ VOLUME /app/data
 EXPOSE 8080
 
 # Start both services
-ENTRYPOINT ["dotnet", "EasyTourChoiceBackend.dll"]
+ENTRYPOINT ["dotnet", "EasyTourChoice.API.dll"]
