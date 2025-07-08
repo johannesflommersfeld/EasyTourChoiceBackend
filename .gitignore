@@ -5,3 +5,5 @@
 [Mm]igrations/
 .idea*
 *.user
+[Bb]uild/
+.DS_Store
