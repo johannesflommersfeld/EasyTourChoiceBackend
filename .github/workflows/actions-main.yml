@@ -36,16 +36,14 @@ jobs:
         if [ -z "$VERSION_SUFFIX" ]; then
           echo "VERSION=$VERSION_PREFIX" >> $GITHUB_ENV
           echo "RELEASE_IMAGE=true" >> $GITHUB_ENV
-          echo "Resolved version: $VERSION"
         elif [[ "$VERSION_SUFFIX" == *"rc"* ]]; then
           echo "VERSION=$VERSION_PREFIX-$VERSION_SUFFIX" >> $GITHUB_ENV
           echo "RELEASE_IMAGE=true" >> $GITHUB_ENV
-          echo "Resolved version: $VERSION"
         else
           echo "VERSION=$VERSION_PREFIX-$VERSION_SUFFIX" >> $GITHUB_ENV
           echo "RELEASE_IMAGE=false" >> $GITHUB_ENV
-          echo "Resolved version: $VERSION"
         fi
+        echo "Resolved version: ${{ env.VERSION }}"
     - name: Log in to DockerHub
       uses: docker/login-action@v3
       with:
@@ -53,7 +51,8 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build and push Docker images
       run: |
-        docker run --rm --privileged tonistiigi/binfmt --install all
+        docker buildx create --use --name backendbuild node-amd64
+        docker buildx create --append --name backendbuild node-arm64
         docker buildx build --platform linux/arm64,linux/amd64 --push \
           -f ./EasyTourChoice.API/easy-tour-choice.api.dockerfile \
           -t ${{ secrets.DOCKER_USERNAME }}/easy-tour-choice-backend:${{ env.VERSION }} \
